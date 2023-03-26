@@ -12,7 +12,13 @@ import java.util.Arrays;
 
 public class Server {
 
+    /**
+     *
+     */
     public final static String REGISTER_COMMAND = "INSCRIRE";
+    /**
+     *
+     */
     public final static String LOAD_COMMAND = "CHARGER";
     private final ServerSocket server;
     private Socket client;
@@ -20,6 +26,11 @@ public class Server {
     private ObjectOutputStream objectOutputStream;
     private final ArrayList<EventHandler> handlers;
 
+    /**
+     *
+     * @param port "Port" est le port sur lequel l'application va desservir le client
+     * @throws IOException  Envoie une exception si le port fournit n'est pas un integer
+     */
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
         this.handlers = new ArrayList<EventHandler>();
@@ -36,6 +47,9 @@ public class Server {
         }
     }
 
+    /**
+     * Cette méthode est la fonction principale de la classe Server. #todo
+     */
     public void run() {
         while (true) {
             try {
@@ -52,6 +66,13 @@ public class Server {
         }
     }
 
+    /**
+     * Cette méthode gère le stream de réception du serveur, afin d'en extraire les requêtes et de lancer les méthodes
+     * appropriées.
+     * @throws IOException Cette exception survient lorsque la ligne de requête n'est pas dans un format pouvant être
+     * traité par le programme
+     * @throws ClassNotFoundException Cette exception survient lorsque #todo
+     */
     public void listen() throws IOException, ClassNotFoundException {
         String line;
         if ((line = this.objectInputStream.readObject().toString()) != null) {
@@ -62,6 +83,11 @@ public class Server {
         }
     }
 
+    /**
+     * Cette méthode reçoit un String d'une ligne de requête reçu par le server et les décomposes en <commande> et <argument>
+     * @param line "line" est le String de la requêtre reçu par le server
+     * @return La méthode retourne une classe Pair (<String commande>, <String arguments>)
+     */
     public Pair<String, String> processCommandLine(String line) {
         String[] parts = line.split(" ");
         String cmd = parts[0];
@@ -69,12 +95,21 @@ public class Server {
         return new Pair<>(cmd, args);
     }
 
+    /**
+     * Cette méthode déconnecte le client du serveur proprement en fermant les streams de données.
+     * @throws IOException Envoie un exception s'il y a une erreur d'entré/sortie
+     */
     public void disconnect() throws IOException {
         objectOutputStream.close();
         objectInputStream.close();
         client.close();
     }
 
+    /**
+     * Cette méthode trie les commandes aves ses arguments et lance la méthode approprié
+     * @param cmd "cmd" est le String de la commande compris dans une requête
+     * @param arg "arg" est le String des arguments compris dans une requête
+     */
     public void handleEvents(String cmd, String arg) {
         if (cmd.equals(REGISTER_COMMAND)) {
             handleRegistration();
