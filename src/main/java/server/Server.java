@@ -13,11 +13,13 @@ import java.util.Arrays;
 public class Server {
 
     /**
-     *
+     *"REGISTER_COMMAND" est une constante d'un String permettant d'identifier une
+     * certaine commande.
      */
     public final static String REGISTER_COMMAND = "INSCRIRE";
     /**
-     *
+     *"LOAD_COMMAND" est une constante d'un String permettant d'identifier une
+     * certaine commande.
      */
     public final static String LOAD_COMMAND = "CHARGER";
     private final ServerSocket server;
@@ -37,6 +39,10 @@ public class Server {
         this.addEventHandler(this::handleEvents);
     }
 
+    /**
+     * Cette méthode enfile un Event à destiner à se faire traiter
+     * @param h "h" est l'évenement enregistré
+     */
     public void addEventHandler(EventHandler h) {
         this.handlers.add(h);
     }
@@ -48,7 +54,10 @@ public class Server {
     }
 
     /**
-     * Cette méthode est la fonction principale de la classe Server. #todo
+     * Cette méthode est la fonction principale de la classe Server. Elle établie
+     * la connection client-serveur afin d'écouter les requêtes, les traiter et
+     * d'envoyer la réponse au client.
+     *
      */
     public void run() {
         while (true) {
