@@ -103,7 +103,7 @@ public class Server {
     }
 
     /**
-     * Cette méthode déconnecte le client du serveur proprement en fermant les streams de données.
+     * Cette méthode déconnecte le client du serveur proprement en fermant les streams de données et la connection.
      * @throws IOException Envoie un exception s'il y a une erreur d'entré/sortie
      */
     public void disconnect() throws IOException {
@@ -133,19 +133,44 @@ public class Server {
      @param arg la session pour laquelle on veut récupérer la liste des cours
      */
     public void handleLoadCourses(String arg) {
+
         BufferedReader reader ;
+
+        //Vérifie que l'argument est valide
+        boolean test = false ;
+        String[] session = {"Ete", "Hiver", "Automne"} ;
+        for (int i = 0 ; i < 3 ; i++) { if(arg == session[i]) { test = true; } }
+        if (!test){ throw new IllegalArgumentException("L'argument n'est pas une session valide") ;}
+
         try {
             reader = new BufferedReader( new FileReader("../data/cours.txt") ) ;
-        } catch (IOException e){
-            System.out.println("Erreur à l'ouverture du fichier 'cours.txt'")
-        }
-        ArrayList<String> cours = new ArrayList<>() ;
-        String cour ;
-        while ( (cour = reader.readLine()) != null ){
-            cours.add(cour) ;
+        } catch (IOException e) {
+            System.out.println("Erreur à l'ouverture du fichier 'cours.txt'") ;
         }
 
-        // TODO: implémenter cette méthode
+        //Extrait seulement les lignes  contenant la bonne session à liste<Object> cours
+        ArrayList<Object> cours = new ArrayList<>() ;
+        String cour ;
+        while ( (cour = reader.readLine()) != null ){
+           String[] coupe = cour.split(" ");
+           if (coupe[2] == arg){ cours.add(cour) ; }
+        }
+        try {
+            reader.close();
+        } catch(IOException e){
+            System.out.println("Erreur lors de la fermeture de 'cours.txt'") ;
+        }
+
+        //construit et envoie le message contenant la liste de cours triée.
+        String res = ""    ;
+        for (int i = 0; i < cours.size() ; i++){
+           res += (String) cours[i] + "\n" ;
+        }
+        try {
+            objectOutputStream.writeByte(res);
+        } catch(IOException e){
+            System.out.println("Erreur de output lors de l'envoie de la liste de cours filtré") ;
+        }
     }
 
     /**
