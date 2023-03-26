@@ -2,9 +2,7 @@ package server;
 
 import javafx.util.Pair;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -40,8 +38,8 @@ public class Server {
     }
 
     /**
-     * Cette méthode enfile un Event à destiner à se faire traiter
-     * @param h "h" est l'évenement enregistré
+     * Cette méthode enfile un Event destiné à se faire traiter
+     * @param h "h" est l'évenement enfilé
      */
     public void addEventHandler(EventHandler h) {
         this.handlers.add(h);
@@ -135,6 +133,18 @@ public class Server {
      @param arg la session pour laquelle on veut récupérer la liste des cours
      */
     public void handleLoadCourses(String arg) {
+        BufferedReader reader ;
+        try {
+            reader = new BufferedReader( new FileReader("../data/cours.txt") ) ;
+        } catch (IOException e){
+            System.out.println("Erreur à l'ouverture du fichier 'cours.txt'")
+        }
+        ArrayList<String> cours = new ArrayList<>() ;
+        String cour ;
+        while ( (cour = reader.readLine()) != null ){
+            cours.add(cour) ;
+        }
+
         // TODO: implémenter cette méthode
     }
 
