@@ -34,7 +34,7 @@ public class Server {
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
         this.handlers = new ArrayList<EventHandler>();
-        this.addEventHandler(this::handleEvents);
+        this.addEventHandler((cmd, arg) -> handleEvents(cmd, arg));
     }
 
     /**
@@ -132,10 +132,12 @@ public class Server {
      La méthode gère les exceptions si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux.
      @param arg la session pour laquelle on veut récupérer la liste des cours
      */
-    public void handleLoadCourses(String arg) {
+    public void handleLoadCourses(String arg) throws IOException, IllegalArgumentException {
 
         BufferedReader reader ;
 
+        //debug , nécessité de tester la session ? car l'appel à cette méthode est fait par
+        // une méthode interne, donc pas sensé recevoir autres choses
         //Vérifie que l'argument est valide
         boolean test = false ;
         String[] session = {"Ete", "Hiver", "Automne"} ;
@@ -145,7 +147,7 @@ public class Server {
         try {
             reader = new BufferedReader( new FileReader("../data/cours.txt") ) ;
         } catch (IOException e) {
-            System.out.println("Erreur à l'ouverture du fichier 'cours.txt'") ;
+            throw new IOException("Erreur à l'ouverture du fichier 'cours.txt'");
         }
 
         //Extrait seulement les lignes  contenant la bonne session à liste<Object> cours
@@ -158,18 +160,20 @@ public class Server {
         try {
             reader.close();
         } catch(IOException e){
-            System.out.println("Erreur lors de la fermeture de 'cours.txt'") ;
+            throw new IOException("Erreur lors de la fermeture de 'cours.txt'") ;
         }
 
         //construit et envoie le message contenant la liste de cours triée.
         String res = ""    ;
         for (int i = 0; i < cours.size() ; i++){
-           res += (String) cours[i] + "\n" ;
+           String[] coupe =  ( (String) cours.get(i) ).split(" ") ;
+           res += coupe[0] + " " + coupe[1] + "\n" ;
         }
         try {
-            objectOutputStream.writeByte(res);
+            //noinspection ReassignedVariable
+            objectOutputStream.writeBytes(res);
         } catch(IOException e){
-            System.out.println("Erreur de output lors de l'envoie de la liste de cours filtré") ;
+            throw new IOException("Erreur de output lors de l'envoie de la liste de cours filtré") ;
         }
     }
 
