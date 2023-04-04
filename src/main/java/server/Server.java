@@ -27,8 +27,8 @@ public class Server {
     private final ArrayList<EventHandler> handlers;
 
     /**
-     *
-     * @param port "Port" est le port sur lequel l'application va desservir le client
+     * Le constructeur instancie un ServerSocket pouvant désservir un seul client à la fois
+     * @param port "Port" est le port sur lequel l'application va desservir les clients
      * @throws IOException  Envoie une exception si le port fournit n'est pas un integer
      */
     public Server(int port) throws IOException {
@@ -38,7 +38,7 @@ public class Server {
     }
 
     /**
-     * Cette méthode enfile un Event destiné à se faire traiter
+     * Cette méthode ajout un EventHandler au server
      * @param h "h" est l'évenement enfilé
      */
     public void addEventHandler(EventHandler h) {
@@ -52,10 +52,9 @@ public class Server {
     }
 
     /**
-     * Cette méthode est la fonction principale de la classe Server. Elle établie
-     * la connection client-serveur afin d'écouter les requêtes, les traiter et
-     * d'envoyer la réponse au client.
-     *
+     * Cette méthode est la fonction principale de la classe Server. Elle attend une connection d'un client.
+     * puis traite ses commandes convenablement. Chaque connection est ensuite close lorsque qu'il n'y pas
+     * plus de commande reçu.
      */
     public void run() {
         while (true) {
@@ -74,11 +73,11 @@ public class Server {
     }
 
     /**
-     * Cette méthode gère le stream de réception du serveur, afin d'en extraire les requêtes et de lancer les méthodes
-     * appropriées.
+     * Cette méthode gère le stream de données provenant du client. Elle extrait les requêtes
+     * et ensuite alerte tous les Handlers.
      * @throws IOException Cette exception survient lorsque la ligne de requête n'est pas dans un format pouvant être
      * traité par le programme
-     * @throws ClassNotFoundException Cette exception survient lorsque #todo
+     * @throws ClassNotFoundException Cette exception survient lorsque le format de donnée reçu n'est pas un Objet.
      */
     public void listen() throws IOException, ClassNotFoundException {
         String line;
@@ -113,7 +112,8 @@ public class Server {
     }
 
     /**
-     * Cette méthode trie les commandes aves ses arguments et lance la méthode approprié
+     * Cette méthode est le "handler" principal de notre server. Elle trie les <cmd> reçu du client
+     * et active la réponse appropriée.
      * @param cmd "cmd" est le String de la commande compris dans une requête
      * @param arg "arg" est le String des arguments compris dans une requête
      */
@@ -136,12 +136,12 @@ public class Server {
 
         BufferedReader reader ;
 
-        //debug , nécessité de tester la session ? car l'appel à cette méthode est fait par
+        //debug #todo , nécessité de tester la session ? car l'appel à cette méthode est fait par
         // une méthode interne, donc pas sensé recevoir autres choses
         //Vérifie que l'argument est valide
         boolean test = false ;
         String[] session = {"Ete", "Hiver", "Automne"} ;
-        for (int i = 0 ; i < 3 ; i++) { if(arg == session[i]) { test = true; } }
+        for (int i = 0 ; i < session.length ; i++) { if(arg == session[i]) { test = true; break ; } }
         if (!test){ throw new IllegalArgumentException("L'argument n'est pas une session valide") ;}
 
         try {
@@ -152,10 +152,11 @@ public class Server {
 
         //Extrait seulement les lignes  contenant la bonne session à liste<Object> cours
         ArrayList<Object> cours = new ArrayList<>() ;
-        String cour ;
-        while ( (cour = reader.readLine()) != null ){
-           String[] coupe = cour.split(" ");
-           if (coupe[2] == arg){ cours.add(cour) ; }
+        String ligne ;
+        while ( (ligne = reader.readLine()) != null ){
+           String[] coupe = ligne.split(" ");
+           //debug #todo est-ce que on peut ajouter ligne si c'est un string ? dans un array d'Objet
+           if (coupe[2] == arg){ cours.add(ligne) ; }
         }
         try {
             reader.close();
@@ -166,24 +167,80 @@ public class Server {
         //construit et envoie le message contenant la liste de cours triée.
         String res = ""    ;
         for (int i = 0; i < cours.size() ; i++){
-           String[] coupe =  ( (String) cours.get(i) ).split(" ") ;
+           String[] coupe =  ( (String) cours.get(i) ).split(" ")  ;
            res += coupe[0] + " " + coupe[1] + "\n" ;
         }
         try {
-            //noinspection ReassignedVariable
-            objectOutputStream.writeBytes(res);
+            //debug #todo pt besoin d'un autre méthode d'écriture vers le client
+            objectOutputStream.writeObject(res);
         } catch(IOException e){
             throw new IOException("Erreur de output lors de l'envoie de la liste de cours filtré") ;
         }
     }
 
     /**
-     Récupérer l'objet 'RegistrationForm' envoyé par le client en utilisant 'objectInputStream', l'enregistrer dans un fichier texte
-     et renvoyer un message de confirmation au client.
-     La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet, l'écriture dans un fichier ou dans le flux de sortie.
+     * Récupérer l'objet 'RegistrationForm' envoyé par le client en
+     * utilisant 'objectInputStream', l'enregistrer dans un fichier texte
+     * et renvoyer un message de confirmation au client.
+     * La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet,
+     * l'écriture dans un fichier ou dans le flux de sortie.
      */
     public void handleRegistration() {
-        // TODO: implémenter cette méthode
+        //premier Objet est déjà lu, cest la requête, la on lit le 2e objet, le registratioForm
+        String[] forme ;
+        try {
+            forme = objectInputStream.readObject().toString().split(" ");
+        }catch(IOException e){
+           throw new IOException("Erreur à la réception du registre d'inscription") ;
+        }
+        //la forme est sensé ressembler à cela:
+        //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
+        String sigle = forme[1] ;
+
+        //vérifier que le cours existe
+        BufferedReader reader ;
+        try {
+            reader = new BufferedReader( new FileReader("../data/cours.txt") ) ;
+        } catch (IOException e) {
+            throw new IOException("Erreur à l'ouverture du fichier 'cours.txt'");
+        }
+
+        //Parcours tous les cours pour vérifier si le sigle correspond
+        String ligne ;
+        boolean test = false;
+        while ( (ligne = reader.readLine()) != null ){
+            String[] coupe = ligne.split(" ");
+            if (coupe[1] == sigle){  test = true ; break ; }
+        }
+        try {
+            reader.close();
+        } catch(IOException e){
+            throw new IOException("Erreur lors de la fermeture de 'cours.txt'") ;
+        }
+
+        //iscription dans le fichier
+        if (test){
+            BufferedWriter writer ;
+            try {
+                writer = new BufferedWriter(new FileWriter("../data/inscription.txt"));
+            }catch (IOException e){
+               throw new IOException("Erreur à l'ouverture du document 'inscription.txt")
+            }
+            writer.write(""); // #todo
+        }
+        else{
+           Object reponse = new String("Le sigle d'inscription correspond à aucun cours, inscription échoué");
+           try {
+               objectOutputStream.writeObject(reponse);
+           } catch(IOException e){
+               throw IOException("Envoie de la réponse au client a échoué")
+           }
+        }
+
+
+
+
+
     }
 }
 
