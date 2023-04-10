@@ -187,6 +187,8 @@ public class Server {
     public void handleRegistration() throws IOException {
         //premier Objet est déjà lu, cest la requête, la on lit le 2e objet, le registratioForm
         String forme ;
+        String reponse ;
+        Boolean estConforme = true;
         try {
             forme = objectInputStream.readObject().toString();
         }catch(IOException | ClassNotFoundException e){
@@ -195,8 +197,13 @@ public class Server {
         //la forme est sensé ressembler à cela:
         //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
 
-        /* #todo est-ce nécessaire de vérifier, puisque c'est envoyé par l'application du client?
-        String sigle = forme.split("\t")[1] ;
+        String[] parts = forme.split("\t");
+        String sigle = parts[1];
+        String matricule = parts[2];
+        String nom = parts[2];
+        String prenom = parts[3] ;
+        reponse = "Félicitation! Incription réussi au réussi de " + prenom + " au cours " + sigle + "\n" ;
+
 
         //vérifier que le cours existe
         BufferedReader reader ;
@@ -208,10 +215,13 @@ public class Server {
 
         //Parcours tous les cours pour vérifier si le sigle correspond
         String ligne ;
-        boolean test = false;
         while ( (ligne = reader.readLine()) != null ){
             String[] coupe = ligne.split(" ");
-            if (coupe[1] == sigle){  test = true ; break ; }
+            if (coupe[1] == sigle) {
+                estConforme = false;
+                reponse = "Échec de l'inscription, le cours n'existe pas";
+                break;
+            }
         }
         try {
             reader.close();
@@ -219,33 +229,40 @@ public class Server {
             throw new IOException("Erreur lors de la fermeture de 'cours.txt'") ;
         }
 
-        //iscription dans le fichier
-        */
-        Boolean test = true ; //#todo changer cela si on vérifie pas
-        if (test){
-            BufferedWriter writer ;
-            try {
-                writer = new BufferedWriter(new FileWriter("../data/inscription.txt"));
-            }catch (IOException e){
-               throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
-            }
-            try {
-                writer.write(forme);
-            }catch (IOException e){
-                throw new IOException("Erreur à l'écriture dans le fichier \"inscription.txt\"\n") ;
-            }
+        //iscription dans le fichier, et vérificatio que pas déjà inscrit
+        BufferedWriter writer ;
+        try {
+            writer = new BufferedWriter(new FileWriter("../data/inscription.txt"));
+            reader = new BufferedReader(new FileReader("../data/inscription.txt"));
+        }catch (IOException e){
+            estConforme = false ;
+            throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }
-        /*
-        else{ //#todo enlever cela
-           Object reponse = new String("Le sigle d'inscription correspond à aucun cours, inscription échoué");
-           try {
-               objectOutputStream.writeObject(reponse);
-           } catch(IOException e){
-               throw IOException("Envoie de la réponse au client a échoué")
-           }
-        }
-        */
+        //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
+        try {
+            //vérification de doublon
+            while ( ( ligne = reader.readLine()) != null ){
+                parts = ligne.split("\t") ;
+                if (parts[2] == matricule){
+                   if (parts[1] == sigle){
+                       estConforme = false ;
+                       reponse = "Échec de l'inscription, l'étudiant est déjà inscrit" ;
+                   }
+                }
+            }
+            //fait l'inscription dans le document
+            if (! estConforme) { writer.write(forme); }
 
+        }catch (IOException e){
+            throw new IOException("Erreur à l'écriture dans le fichier \"inscription.txt\"\n") ;
+        }
+
+        //envoie de la réponse de réussi ou non au client
+       try {
+           objectOutputStream.writeObject(reponse);
+       } catch(IOException e){
+           throw new IOException("Envoie de la réponse au client a échoué" );
+       }
     }
 }
 
