@@ -40,22 +40,20 @@ public class Client_terminal {
     private static void choixSession() {
         System.out.println("Veuillez choisir la session pour laquelle vous voulez consulter la liste des cours:\n1. Automne\n2. Hiver\n3. Ete\n") ;
 
-        int choix = -1;
-        try { choix = Integer.parseInt(userInput); }
-        catch(Exception e){ System.out.println("Svp entré un choix valide\n") ; choixSession() ; }
-
-        if (choix < 1 || choix > 3){
-        System.out.println("Svp entré un choix valide entre 1, 2 et 3\n") ; choixSession() ;
-        }
-
-        choixCours(choix) ;
+        choixCours(getUserInt(3)) ;
 
     }
     private static void choixCours(int choix) {
         ArrayList<String> listeDeCours = null;
+
+        String[] session = {"Automne", "Ete", "Hiver"} ;
+        String cmd = "CHARGER" ;
+        String arg = session[choix-1] ;
+        String requete = cmd + " " + arg ;
+
+        //requête des cours offerts à la session sélectionné au serveur
         try{
-            String cmd = "CHARGER" ;
-            output.writeObject(cmd) ;
+            output.writeObject(requete) ;
 
             Object object = input.readObject() ;
             listeDeCours = (ArrayList<String>) object ;
@@ -66,21 +64,58 @@ public class Client_terminal {
         }
         String messageDeOuverture = "Les cours offerts pendant la session d'automne sont:\n " ;
         int chiffre = 1 ;
+        if (listeDeCours.isEmpty()) { messageDeOuverture+= "*** Aucun cours disponible ***\n";}
+
         while ( !listeDeCours.isEmpty()){
-           messageDeOuverture += chiffre + " " + listeDeCours.get(chiffre - 1) + "\n"   ;
+           messageDeOuverture += chiffre + ". " + listeDeCours.remove(0) + "\n"   ;
            chiffre++ ;
         }
         System.out.println(messageDeOuverture + "Choix;\n1. Consulter les cours offerts pour une autre session\n2. Inscription à un cours\nChoix: ") ;
-        // eheh monsieur, chu rendu ici #todo rendu ici
-        try
-        int choixDeux = Integer.parseInt(userInput) ;
-        if (choixDeux)
 
+        int decision  = getUserInt(chiffre-1) ;
+        switch(decision){
+            case 1:
+                choixSession(); break;
+            case 2:
+                inscription(); break ;
+            default:
+                System.out.println("May god have mercy on you soul, you are not supposed to be here");
+        }
+    }
+    private static int getUserInt(int quantite){
+        int choix = -1 ;
+        try { choix = Integer.parseInt(userInput); }
+        catch(Exception e){ System.out.println("Svp entré un choix valide\n") ; getUserInt(quantite) ; }
 
+        if (choix < 1 || choix > quantite){
+            System.out.println("Svp entré un choix valide\n") ; choix = getUserInt(quantite) ;
+        }
+        return choix ;
 
+    }
+    private static String getUserString(String demande){
+        String input = "";
+        System.out.println("Veuiller saisir " + demande + ": ")
+        try {input = userInput ;}
+        catch(Exception e){ System.out.println("Svp entré un choix valide\nVeuiller saisir " + demande + ": ") ; getUserString(demande) ; }
+        return input ;
+    }
+    private static void inscription(){
+        String prenom = getUserString("votre prénom");
+        String nom = getUserString("votre nom");
+        String email = getUserString("votre email");
+        String matricule = getUserString("votre matricule");
+        String sigle = getUserString("le code du cours");
+        //todo rendu ici :)
 
-
-        System.out.println(messageDeOuverture) ;
-
+    }
+    private static void deconnection() {
+        try {
+            output.close();
+            input.close();
+        } catch (IOException e) {
+            System.out.println("erreur lors de la déconnection au serveur");
+            throw new RuntimeException(e);
+        }
     }
 }
