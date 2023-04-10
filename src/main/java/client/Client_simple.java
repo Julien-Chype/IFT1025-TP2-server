@@ -3,13 +3,12 @@ package client;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.lang.System ;
 
-public class Client_terminal {
+public class Client_simple {
     private final static Scanner scanner = new Scanner(System.in);
     private static Socket client ;
     private static String choixSession ;
@@ -23,9 +22,13 @@ public class Client_terminal {
             System.exit(0) ;
         }
 
+        System.out.println("connection faites"); //debug
         try {
+            System.out.println("juste avant de get les streams"); //debug
             input = new ObjectInputStream(client.getInputStream());
+            System.out.println("input good "); //debug
             output = new ObjectOutputStream(client.getOutputStream());
+            System.out.println("juste après de les streams"); //debug
         }catch(Exception e){
             System.out.println("Échec d'établissement de passerelle client/serveur");
             System.exit(0) ;
