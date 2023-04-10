@@ -11,8 +11,8 @@ import java.lang.System ;
 
 public class Client_terminal {
     private final static Scanner scanner = new Scanner(System.in);
-    private static String userInput = scanner.nextLine();
     private static Socket client ;
+    private static String choixSession ;
     private static ObjectInputStream input ;
     private static ObjectOutputStream output ;
     public static void main(String[] args) throws IOException {
@@ -49,6 +49,7 @@ public class Client_terminal {
         String[] session = {"Automne", "Ete", "Hiver"} ;
         String cmd = "CHARGER" ;
         String arg = session[choix-1] ;
+        choixSession = arg ;
         String requete = cmd + " " + arg ;
 
         //requête des cours offerts à la session sélectionné au serveur
@@ -84,7 +85,7 @@ public class Client_terminal {
     }
     private static int getUserInt(int quantite){
         int choix = -1 ;
-        try { choix = Integer.parseInt(userInput); }
+        try { choix = Integer.parseInt(scanner.nextLine()); }
         catch(Exception e){ System.out.println("Svp entré un choix valide\n") ; getUserInt(quantite) ; }
 
         if (choix < 1 || choix > quantite){
@@ -95,8 +96,8 @@ public class Client_terminal {
     }
     private static String getUserString(String demande){
         String input = "";
-        System.out.println("Veuiller saisir " + demande + ": ")
-        try {input = userInput ;}
+        System.out.println("Veuiller saisir " + demande + ": ") ;
+        try {input = scanner.nextLine() ;}
         catch(Exception e){ System.out.println("Svp entré un choix valide\nVeuiller saisir " + demande + ": ") ; getUserString(demande) ; }
         return input ;
     }
@@ -106,7 +107,16 @@ public class Client_terminal {
         String email = getUserString("votre email");
         String matricule = getUserString("votre matricule");
         String sigle = getUserString("le code du cours");
-        //todo rendu ici :)
+
+        String forme = choixSession + "\t" + sigle + "\t" + matricule + "\t" + nom + "\t" + prenom + "\t" + email + "\n" ;
+        try{
+            output.writeObject(forme);
+            String message = input.readObject().toString();
+            System.out.println(message) ; //todo attendre la réponse comment ? si le serveur est lent
+        }catch(Exception e){
+            System.out.println("erreur lors de l'envoie de la forme");
+            System.exit(0) ;
+        }
 
     }
     private static void deconnection() {
