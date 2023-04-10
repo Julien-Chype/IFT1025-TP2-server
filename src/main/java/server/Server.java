@@ -34,7 +34,7 @@ public class Server {
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
         this.handlers = new ArrayList<EventHandler>();
-        this.addEventHandler((cmd, arg) -> handleEvents(cmd, arg));
+        this.addEventHandler(this::handleEvents);
     }
 
     /**
@@ -45,7 +45,7 @@ public class Server {
         this.handlers.add(h);
     }
 
-    private void alertHandlers(String cmd, String arg) {
+    private void alertHandlers(String cmd, String arg) throws IOException {
         for (EventHandler h : this.handlers) {
             h.handle(cmd, arg);
         }
@@ -117,7 +117,7 @@ public class Server {
      * @param cmd "cmd" est le String de la commande compris dans une requête
      * @param arg "arg" est le String des arguments compris dans une requête
      */
-    public void handleEvents(String cmd, String arg) {
+    public void handleEvents(String cmd, String arg) throws IOException {
         if (cmd.equals(REGISTER_COMMAND)) {
             handleRegistration();
         } else if (cmd.equals(LOAD_COMMAND)) {
@@ -138,25 +138,30 @@ public class Server {
 
         //debug #todo , nécessité de tester la session ? car l'appel à cette méthode est fait par
         // une méthode interne, donc pas sensé recevoir autres choses
+
         //Vérifie que l'argument est valide
         boolean test = false ;
         String[] session = {"Ete", "Hiver", "Automne"} ;
         for (int i = 0 ; i < session.length ; i++) { if(arg == session[i]) { test = true; break ; } }
         if (!test){ throw new IllegalArgumentException("L'argument n'est pas une session valide") ;}
 
+        //ouverture du document texte contenu les cours
         try {
             reader = new BufferedReader( new FileReader("../data/cours.txt") ) ;
         } catch (IOException e) {
             throw new IOException("Erreur à l'ouverture du fichier 'cours.txt'");
         }
 
-        //Extrait seulement les lignes  contenant la bonne session à liste<Object> cours
-        ArrayList<Object> cours = new ArrayList<>() ;
+        //Extrait seulement les lignes  contenant la bonne session et construit la liste
+        //à remettre au client
+        ArrayList<String> cours = new ArrayList<>() ;
         String ligne ;
         while ( (ligne = reader.readLine()) != null ){
-           String[] coupe = ligne.split(" ");
-           //debug #todo est-ce que on peut ajouter ligne si c'est un string ? dans un array d'Objet
-           if (coupe[2] == arg){ cours.add(ligne) ; }
+           String[] coupe = ligne.split("\t");
+           if (coupe[2] == arg){
+               String ligneRecuParClient = coupe[0] + "\t" + coupe[1] ;
+               cours.add(ligneRecuParClient) ;
+           }
         }
         try {
             reader.close();
@@ -164,17 +169,11 @@ public class Server {
             throw new IOException("Erreur lors de la fermeture de 'cours.txt'") ;
         }
 
-        //construit et envoie le message contenant la liste de cours triée.
-        String res = ""    ;
-        for (int i = 0; i < cours.size() ; i++){
-           String[] coupe =  ( (String) cours.get(i) ).split(" ")  ;
-           res += coupe[0] + " " + coupe[1] + "\n" ;
-        }
+        //remise du ArrayList<String> au client
         try {
-            //debug #todo pt besoin d'un autre méthode d'écriture vers le client
-            objectOutputStream.writeObject(res);
+            objectOutputStream.writeObject(cours);
         } catch(IOException e){
-            throw new IOException("Erreur de output lors de l'envoie de la liste de cours filtré") ;
+            throw new IOException("Erreur d'output lors de l'envoie de la liste de cours filtré") ;
         }
     }
 
@@ -185,17 +184,19 @@ public class Server {
      * La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet,
      * l'écriture dans un fichier ou dans le flux de sortie.
      */
-    public void handleRegistration() {
+    public void handleRegistration() throws IOException {
         //premier Objet est déjà lu, cest la requête, la on lit le 2e objet, le registratioForm
-        String[] forme ;
+        String forme ;
         try {
-            forme = objectInputStream.readObject().toString().split(" ");
-        }catch(IOException e){
+            forme = objectInputStream.readObject().toString();
+        }catch(IOException | ClassNotFoundException e){
            throw new IOException("Erreur à la réception du registre d'inscription") ;
         }
         //la forme est sensé ressembler à cela:
         //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
-        String sigle = forme[1] ;
+
+        /* #todo est-ce nécessaire de vérifier, puisque c'est envoyé par l'application du client?
+        String sigle = forme.split("\t")[1] ;
 
         //vérifier que le cours existe
         BufferedReader reader ;
@@ -219,16 +220,23 @@ public class Server {
         }
 
         //iscription dans le fichier
+        */
+        Boolean test = true ; //#todo changer cela si on vérifie pas
         if (test){
             BufferedWriter writer ;
             try {
                 writer = new BufferedWriter(new FileWriter("../data/inscription.txt"));
             }catch (IOException e){
-               throw new IOException("Erreur à l'ouverture du document 'inscription.txt")
+               throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
             }
-            writer.write(""); // #todo
+            try {
+                writer.write(forme);
+            }catch (IOException e){
+                throw new IOException("Erreur à l'écriture dans le fichier \"inscription.txt\"\n") ;
+            }
         }
-        else{
+        /*
+        else{ //#todo enlever cela
            Object reponse = new String("Le sigle d'inscription correspond à aucun cours, inscription échoué");
            try {
                objectOutputStream.writeObject(reponse);
@@ -236,10 +244,7 @@ public class Server {
                throw IOException("Envoie de la réponse au client a échoué")
            }
         }
-
-
-
-
+        */
 
     }
 }
