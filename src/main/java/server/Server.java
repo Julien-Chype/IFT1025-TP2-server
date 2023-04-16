@@ -1,4 +1,3 @@
-// test commit
 
 package server;
 
@@ -175,7 +174,7 @@ public class Server {
         try {
             objectOutputStream.writeObject(cours);
         } catch(IOException e){
-            throw new IOException("Erreur d'output lors de l'envoie de la liste de cours filtré") ;
+            throw new IOException("Erreur d'output lors de l'envoie de la liste de cours filtrée") ;
         }
     }
 
@@ -187,7 +186,7 @@ public class Server {
      * l'écriture dans un fichier ou dans le flux de sortie.
      */
     public void handleRegistration() throws IOException {
-        //premier Objet est déjà lu, cest la requête, la on lit le 2e objet, le registratioForm
+        //premier Objet est déjà lu, cest la requête, la on lit le 2e objet, le registrationForm
         String forme ;
         String reponse ;
         Boolean estConforme = true;
@@ -199,7 +198,7 @@ public class Server {
         //la forme est sensé ressembler à cela:
         //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
 
-        String[] parts = forme.split("\t");
+        String[] parts = forme.split("\t"); //todo: doesn't make sense, should use the registrationForm API
         String sigle = parts[1];
         String matricule = parts[2];
         String nom = parts[2];
