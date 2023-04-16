@@ -1,0 +1,20 @@
+
+
+structure:
+
+client
+    - controllers
+        - Client
+    - views
+        - ClientView
+        - CLIClientview
+        - GUIClientview
+    - CLIClientLauncher
+    - GUIClientLauncher
+server
+    - models
+        - Course
+        - RegistrationForm
+    - Server
+    - ServerLauncher
+
