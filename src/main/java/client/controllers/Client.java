@@ -7,6 +7,7 @@ import server.models.Course;
 import server.models.RegistrationForm;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -41,6 +42,9 @@ public class Client {
 
         // creation des input et output stream
         try {
+
+            InputStream x = client.getInputStream();
+
             input = new ObjectInputStream(client.getInputStream());
             output = new ObjectOutputStream(client.getOutputStream());
         }catch(Exception e){
@@ -49,6 +53,7 @@ public class Client {
         }
 
         this.view = view;
+
     }
 
     public void run(){
@@ -75,11 +80,12 @@ public class Client {
                 case "CHARGER":
                     String session = view.getCourseListSessionInfo();
                     ArrayList<Course> cours = sendCourseListRequest(session);
-                    view.processCourseListResponse(cours);
+                    view.processCourseListResponse(session, cours);
                     break;
 
                 case "QUITTER":
                     stop = true;
+                    disconnect();
                     break;
             }
         }
@@ -127,7 +133,7 @@ public class Client {
     }
 
     private ArrayList<Course> sendCourseListRequest(String session){
-        ArrayList<Course> cours = new ArrayList<Course>;
+        ArrayList<Course> cours = new ArrayList<Course>();
         try{
             output.writeObject(session);
             cours = waitForClassListRequestResponse();

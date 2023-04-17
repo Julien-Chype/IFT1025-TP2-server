@@ -64,8 +64,8 @@ public class Server {
             try {
                 client = server.accept();
                 System.out.println("Connecté au client: " + client);
-                objectInputStream = new ObjectInputStream(client.getInputStream());
                 objectOutputStream = new ObjectOutputStream(client.getOutputStream());
+                objectInputStream = new ObjectInputStream(client.getInputStream());
                 listen();
                 disconnect();
                 System.out.println("Client déconnecté!");
@@ -145,7 +145,13 @@ public class Server {
         //Vérifie que l'argument est valide
         boolean test = false ;
         String[] session = {"Ete", "Hiver", "Automne"} ;
-        for (int i = 0 ; i < session.length ; i++) { if(arg == session[i]) { test = true; break ; } }
+
+        for (String s : session) {
+            if (arg.equals(s)) {
+                test = true;
+                break;
+            }
+        }
         if (!test){ throw new IllegalArgumentException("L'argument n'est pas une session valide") ;}
 
         //ouverture du document texte contenu les cours
@@ -204,7 +210,10 @@ public class Server {
         String sigle = forme.getCourse().getCode();
         String matricule = forme.getMatricule();
         String nom = forme.getNom();
+        String email = forme.getEmail();
         String prenom = forme.getPrenom() ;
+        String session = "";
+
         reponse = "Félicitation! Incription réussi au réussi de " + prenom + " au cours " + sigle + "\n" ;
 
 
@@ -218,15 +227,20 @@ public class Server {
 
         //Parcours tous les cours pour vérifier si le sigle correspond
         String ligne ;
+        boolean coursExiste = false;
         while ( (ligne = reader.readLine()) != null ){
             String[] coupe = ligne.split(" ");
 
             if (coupe[1].equals(sigle)) {
-                estConforme = false;
-                reponse = "Échec de l'inscription, le cours n'existe pas";
+                coursExiste = true;
+                session = coupe[2];
                 break;
             }
         }
+        if (!coursExiste){
+            reponse = "Échec de l'inscription, le cours n'existe pas";
+        }
+
         try {
             reader.close();
         } catch(IOException e){
@@ -243,23 +257,18 @@ public class Server {
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }
         //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
-
-
-        // todo: fix the stuff below
-
         try {
             //vérification de doublon
             while ( ( ligne = reader.readLine()) != null ){
-                parts = ligne.split("\t") ;
-                if (parts[2] == matricule){
-                   if (parts[1] == sigle){
-                       estConforme = false ;
-                       reponse = "Échec de l'inscription, l'étudiant est déjà inscrit" ;
-                   }
+                String[] parts = ligne.split("\t") ;
+                if (parts[2].equals(matricule) && parts[1].equals(sigle)){
+                   estConforme = false ;
+                   reponse = "Échec de l'inscription, l'étudiant est déjà inscrit" ;
                 }
             }
             //fait l'inscription dans le document
-            if (! estConforme) { writer.write(forme); }
+            if (estConforme) { writer.write(session + "\t" + sigle + '\t'
+                    + matricule + '\t' + nom + '\t' + prenom + '\t' + email + '\n'); }
 
         }catch (IOException e){
             throw new IOException("Erreur à l'écriture dans le fichier \"inscription.txt\"\n") ;

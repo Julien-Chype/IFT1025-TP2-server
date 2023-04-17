@@ -11,6 +11,6 @@ public abstract class ClientView {
     public abstract RegistrationForm getRegistrationInfo();
     public abstract String getCourseListSessionInfo();
     public abstract void processRegistrationResponse(String response);
-    public abstract void processCourseListResponse(ArrayList<Course> cours);
+    public abstract void processCourseListResponse(String session, ArrayList<Course> cours);
 
 }

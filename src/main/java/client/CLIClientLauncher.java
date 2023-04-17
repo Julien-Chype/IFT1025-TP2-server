@@ -12,9 +12,9 @@ public class CLIClientLauncher {
         try {
 
             CLIClientView view = new CLIClientView();
-
             client = new Client(PORT, view);
             System.out.println("client is running...");
+            System.out.println("*** Bienvenue au portail d'inscription de cours de l'UDEM ***") ;
             client.run();
         } catch (Exception e) {
             e.printStackTrace();
