@@ -18,3 +18,6 @@ server
     - Server
     - ServerLauncher
 
+1. write an explanation of how the whole progam functions to make sure you understand.
+2. Write API functions for each of the classes
+3. Write the different classes
