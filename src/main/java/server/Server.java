@@ -2,6 +2,8 @@
 package server;
 
 import javafx.util.Pair;
+import server.models.Course;
+import server.models.RegistrationForm;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -155,13 +157,14 @@ public class Server {
 
         //Extrait seulement les lignes  contenant la bonne session et construit la liste
         //à remettre au client
-        ArrayList<String> cours = new ArrayList<>() ;
+        ArrayList<Course> cours = new ArrayList<Course>() ;
+
         String ligne ;
+
         while ( (ligne = reader.readLine()) != null ){
            String[] coupe = ligne.split("\t");
-           if (coupe[2] == arg){
-               String ligneRecuParClient = coupe[0] + "\t" + coupe[1] ;
-               cours.add(ligneRecuParClient) ;
+           if (coupe[2].equals(arg)){
+               cours.add(new Course(coupe[1], coupe[0], coupe[2])) ;
            }
         }
         try {
@@ -170,7 +173,7 @@ public class Server {
             throw new IOException("Erreur lors de la fermeture de 'cours.txt'") ;
         }
 
-        //remise du ArrayList<String> au client
+        //remise du ArrayList<Course> au client
         try {
             objectOutputStream.writeObject(cours);
         } catch(IOException e){
@@ -187,22 +190,21 @@ public class Server {
      */
     public void handleRegistration() throws IOException {
         //premier Objet est déjà lu, cest la requête, la on lit le 2e objet, le registrationForm
-        String forme ;
+        RegistrationForm forme ;
         String reponse ;
-        Boolean estConforme = true;
+        boolean estConforme = true;
         try {
-            forme = objectInputStream.readObject().toString();
+            forme = (RegistrationForm) objectInputStream.readObject();
         }catch(IOException | ClassNotFoundException e){
            throw new IOException("Erreur à la réception du registre d'inscription") ;
         }
         //la forme est sensé ressembler à cela:
         //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
 
-        String[] parts = forme.split("\t"); //todo: doesn't make sense, should use the registrationForm API
-        String sigle = parts[1];
-        String matricule = parts[2];
-        String nom = parts[2];
-        String prenom = parts[3] ;
+        String sigle = forme.getCourse().getCode();
+        String matricule = forme.getMatricule();
+        String nom = forme.getNom();
+        String prenom = forme.getPrenom() ;
         reponse = "Félicitation! Incription réussi au réussi de " + prenom + " au cours " + sigle + "\n" ;
 
 
@@ -218,7 +220,8 @@ public class Server {
         String ligne ;
         while ( (ligne = reader.readLine()) != null ){
             String[] coupe = ligne.split(" ");
-            if (coupe[1] == sigle) {
+
+            if (coupe[1].equals(sigle)) {
                 estConforme = false;
                 reponse = "Échec de l'inscription, le cours n'existe pas";
                 break;
@@ -240,6 +243,10 @@ public class Server {
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }
         //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
+
+
+        // todo: fix the stuff below
+
         try {
             //vérification de doublon
             while ( ( ligne = reader.readLine()) != null ){

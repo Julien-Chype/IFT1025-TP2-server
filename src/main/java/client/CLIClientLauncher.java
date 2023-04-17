@@ -14,7 +14,7 @@ public class CLIClientLauncher {
             CLIClientView view = new CLIClientView();
 
             client = new Client(PORT, view);
-            System.out.println("Server is running...");
+            System.out.println("client is running...");
             client.run();
         } catch (Exception e) {
             e.printStackTrace();

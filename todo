@@ -1,4 +1,16 @@
 
+next:
+- write the CLIview to have everything in the logic assembled
+- fix the Server logic
+- try to compile into jars and fix all the errors
+- debug the logic of the CLI program
+- write the GUIClientView
+- compile and fix all the errors on that
+- generate javadocs on everything
+- change variable names and divide code into easy sections for visualization
+- make mp4 video
+
+
 
 structure:
 

@@ -4,6 +4,7 @@ package client.controllers;
 
 import client.views.*;
 import server.models.Course;
+import server.models.RegistrationForm;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -66,9 +67,9 @@ public class Client {
 
                 case "INSCRIRE":
                     // here we need to get the inscription info from the current view
-                    String forme = view.getInscriptionInfo();
+                    RegistrationForm forme = view.getRegistrationInfo();
                     String response = sendRegistrationRequest(forme);
-                    view.processInscriptionResponse(response);
+                    view.processRegistrationResponse(response);
                     break;
 
                 case "CHARGER":
@@ -112,7 +113,7 @@ public class Client {
         return cours;
     }
 
-    public String sendRegistrationRequest(String forme){
+    private String sendRegistrationRequest(RegistrationForm forme){
         String message = "";
         try{
             output.writeObject(forme);
@@ -125,7 +126,7 @@ public class Client {
         return message;
     }
 
-    public ArrayList<Course> sendCourseListRequest(String session){
+    private ArrayList<Course> sendCourseListRequest(String session){
         ArrayList<Course> cours = new ArrayList<Course>;
         try{
             output.writeObject(session);
@@ -137,11 +138,10 @@ public class Client {
         return cours;
     }
 
-    public void deconnection() {
+    public void disconnect() {
         try {
             output.close();
             input.close();
-            this.client.close();
         } catch (IOException e) {
             System.out.println("erreur lors de la déconnection au serveur");
             throw new RuntimeException(e);
