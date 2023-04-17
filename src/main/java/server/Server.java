@@ -60,19 +60,21 @@ public class Server {
      * plus de commande reçu.
      */
     public void run() {
-        while (true) {
-            try {
-                client = server.accept();
-                System.out.println("Connecté au client: " + client);
-                objectOutputStream = new ObjectOutputStream(client.getOutputStream());
-                objectInputStream = new ObjectInputStream(client.getInputStream());
+        try {
+            client = server.accept();
+            System.out.println("Connecté au client: " + client);
+            objectOutputStream = new ObjectOutputStream(client.getOutputStream());
+            objectInputStream = new ObjectInputStream(client.getInputStream());
+//            listen();
+//            disconnect();
+//            System.out.println("Client déconnecté!");
+            while (true){
                 listen();
-                disconnect();
-                System.out.println("Client déconnecté!");
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     /**
@@ -85,9 +87,11 @@ public class Server {
     public void listen() throws IOException, ClassNotFoundException {
         String line;
         if ((line = this.objectInputStream.readObject().toString()) != null) {
+            System.out.println(line);
             Pair<String, String> parts = processCommandLine(line);
             String cmd = parts.getKey();
             String arg = parts.getValue();
+            System.out.println(cmd + " " + arg);
             this.alertHandlers(cmd, arg);
         }
     }
@@ -111,7 +115,7 @@ public class Server {
     public void disconnect() throws IOException {
         objectOutputStream.close();
         objectInputStream.close();
-        client.close();
+//        client.close();
     }
 
     /**
@@ -122,8 +126,10 @@ public class Server {
      */
     public void handleEvents(String cmd, String arg) throws IOException {
         if (cmd.equals(REGISTER_COMMAND)) {
+            System.out.println("Starting registration handling");
             handleRegistration();
         } else if (cmd.equals(LOAD_COMMAND)) {
+            System.out.println("Starting course load handling");
             handleLoadCourses(arg);
         }
     }
@@ -156,8 +162,9 @@ public class Server {
 
         //ouverture du document texte contenu les cours
         try {
-            reader = new BufferedReader( new FileReader("../data/cours.txt") ) ;
+            reader = new BufferedReader( new FileReader("src/main/java/server/data/cours.txt")) ;
         } catch (IOException e) {
+            e.printStackTrace();
             throw new IOException("Erreur à l'ouverture du fichier 'cours.txt'");
         }
 
@@ -181,6 +188,7 @@ public class Server {
 
         //remise du ArrayList<Course> au client
         try {
+            System.out.println("sending courses over");
             objectOutputStream.writeObject(cours);
         } catch(IOException e){
             throw new IOException("Erreur d'output lors de l'envoie de la liste de cours filtrée") ;
@@ -220,7 +228,7 @@ public class Server {
         //vérifier que le cours existe
         BufferedReader reader ;
         try {
-            reader = new BufferedReader( new FileReader("../data/cours.txt") ) ;
+            reader = new BufferedReader( new FileReader("src/main/java/server/data/cours.txt") ) ;
         } catch (IOException e) {
             throw new IOException("Erreur à l'ouverture du fichier 'cours.txt'");
         }
@@ -229,9 +237,9 @@ public class Server {
         String ligne ;
         boolean coursExiste = false;
         while ( (ligne = reader.readLine()) != null ){
-            String[] coupe = ligne.split(" ");
+            String[] coupe = ligne.split("\t");
 
-            if (coupe[1].equals(sigle)) {
+            if (coupe[0].equals(sigle)) {
                 coursExiste = true;
                 session = coupe[2];
                 break;
@@ -248,10 +256,8 @@ public class Server {
         }
 
         //iscription dans le fichier, et vérificatio que pas déjà inscrit
-        BufferedWriter writer ;
         try {
-            writer = new BufferedWriter(new FileWriter("../data/inscription.txt"));
-            reader = new BufferedReader(new FileReader("../data/inscription.txt"));
+            reader = new BufferedReader(new FileReader("src/main/java/server/data/inscription.txt"));
         }catch (IOException e){
             estConforme = false ;
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
@@ -266,16 +272,31 @@ public class Server {
                    reponse = "Échec de l'inscription, l'étudiant est déjà inscrit" ;
                 }
             }
-            //fait l'inscription dans le document
-            if (estConforme) { writer.write(session + "\t" + sigle + '\t'
-                    + matricule + '\t' + nom + '\t' + prenom + '\t' + email + '\n'); }
-
         }catch (IOException e){
             throw new IOException("Erreur à l'écriture dans le fichier \"inscription.txt\"\n") ;
         }
+        reader.close();
+
+        // ouvrir le writer
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter("src/main/java/server/data/inscription.txt"));
+        }catch (IOException e){
+            throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
+        }
+
+        // ecrire au fichier
+        try{
+            if (estConforme) { writer.write(session + "\t" + sigle + '\t'
+                    + matricule + '\t' + nom + '\t' + prenom + '\t' + email + '\n'); }
+        }catch (IOException e){
+            throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
+        }
+        writer.close();
 
         //envoie de la réponse de réussi ou non au client
        try {
+           System.out.println("sending response over");
            objectOutputStream.writeObject(reponse);
        } catch(IOException e){
            throw new IOException("Envoie de la réponse au client a échoué" );

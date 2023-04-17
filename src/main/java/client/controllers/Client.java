@@ -3,6 +3,7 @@
 package client.controllers;
 
 import client.views.*;
+import javafx.util.Pair;
 import server.models.Course;
 import server.models.RegistrationForm;
 
@@ -12,7 +13,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Client {
     /*
@@ -114,6 +114,7 @@ public class Client {
         }
         catch (Exception e){
             System.out.println("erreur lors de la reception de la reponse du serveur pour l'inscription");
+            e.printStackTrace();
             System.exit(0) ;
         }
         return cours;
@@ -122,6 +123,7 @@ public class Client {
     private String sendRegistrationRequest(RegistrationForm forme){
         String message = "";
         try{
+            output.writeObject("INSCRIRE");
             output.writeObject(forme);
             message = waitForRegistrationResponse();
             System.out.println(message);
@@ -135,7 +137,7 @@ public class Client {
     private ArrayList<Course> sendCourseListRequest(String session){
         ArrayList<Course> cours = new ArrayList<Course>();
         try{
-            output.writeObject(session);
+            output.writeObject("CHARGER " + session);
             cours = waitForClassListRequestResponse();
         }catch(Exception e){
             System.out.println("erreur lors de l'envoie de la forme pour la requete de cours");

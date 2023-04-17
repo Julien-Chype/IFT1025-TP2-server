@@ -40,7 +40,7 @@ public class CLIClientView extends ClientView{
         System.out.println("\n1. Consulter les cours offerts pour une session\n2. Inscription à un cours\n> Choix: ") ;
         int decision  = getUserInt(2) ;
 
-        if (decision == 0){
+        if (decision == 1){
             return "CHARGER";
         }else{
             return "INSCRIRE";
