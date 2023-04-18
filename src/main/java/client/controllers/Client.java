@@ -94,11 +94,6 @@ public class Client {
                     ArrayList<Course> cours = sendCourseListRequest(session);
                     view.processCourseListResponse(session, cours);
                     break;
-
-                case "QUITTER":
-                    stop = true;
-                    disconnect();
-                    break;
             }
         }
     }
@@ -138,7 +133,6 @@ public class Client {
             output.writeObject("INSCRIRE");
             output.writeObject(forme);
             message = waitForRegistrationResponse();
-            System.out.println(message);
         }catch(Exception e){
             System.out.println("erreur lors de l'envoie de la forme pour l'inscription");
             System.exit(0) ;
