@@ -1,6 +1,5 @@
 package client.controllers;
 
-import client.GUIClientApp;
 import server.models.Course;
 import server.models.RegistrationForm;
 
@@ -11,7 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * The type Gui client.
+ * La classe client qui interface avec le serveur pour l'application GUI
  */
 public class GUIClient {
 
@@ -22,10 +21,10 @@ public class GUIClient {
     private String HOST ;
 
     /**
-     * Instantiates a new Gui client.
+     * creation d'un nouveau GUIClient
      *
-     * @param port the port
-     * @param host the host
+     * @param port le port
+     * @param host le host
      */
     public GUIClient(int port, String host){
 
@@ -34,13 +33,15 @@ public class GUIClient {
     }
 
     /**
-     * Establish connection.
+     * etablir une connection avec le serveur
      *
      * @param port the port
      * @param host the host
      */
     public void establishConnection(int port, String host){
-        // creation du socket
+
+        // ================ creation du socket ================
+
         try {
             client = new Socket(host, port);
         }
@@ -48,7 +49,9 @@ public class GUIClient {
             System.out.println("Échec de la connection au serveur de l'UDEM");
             System.exit(0) ;
         }
-        // creation des input et output stream
+
+        // ================ creation des input et output stream ================
+
         try {
             input = new ObjectInputStream(client.getInputStream());
             output = new ObjectOutputStream(client.getOutputStream());
@@ -59,9 +62,9 @@ public class GUIClient {
     }
 
     /**
-     * Wait for registration response string.
+     * attente pour la reponse d'inscription du serveur
      *
-     * @return the string
+     * @return la reponse du serveur
      */
     public String waitForRegistrationResponse(){
 
@@ -80,9 +83,9 @@ public class GUIClient {
     }
 
     /**
-     * Wait for class list request response array list.
+     * attente pour la liste des classes disponibles du serveur
      *
-     * @return the array list
+     * @return la liste des cours en ArrayList
      */
     public ArrayList<Course> waitForClassListRequestResponse(){
         ArrayList<Course> cours = new ArrayList<>();
@@ -99,10 +102,10 @@ public class GUIClient {
     }
 
     /**
-     * Send registration request string.
+     * envoie au serveur de la requete d'inscription
      *
-     * @param forme the forme
-     * @return the string
+     * @param forme la forme
+     * @return le message de retour du serveur
      */
     public String sendRegistrationRequest(RegistrationForm forme){
         String message = "";
@@ -118,10 +121,10 @@ public class GUIClient {
     }
 
     /**
-     * Send course list request array list.
+     * envoie au serveur de la requete de visionnement de la liste des cours
      *
-     * @param session the session
-     * @return the array list
+     * @param session la session
+     * @return liste des cours
      */
     public ArrayList<Course> sendCourseListRequest(String session){
         ArrayList<Course> cours = new ArrayList<Course>();
@@ -136,7 +139,7 @@ public class GUIClient {
     }
 
     /**
-     * Disconnect.
+     * deconnection des Stream d'input et output.
      */
     public void disconnect() {
         try {

@@ -80,6 +80,7 @@ public class GUIClientApp extends Application {
         courseListText.setFont(Font.font("serif", 20));
 
         // ================ definition de la combobox de session et du bouton de chargement ================
+
         HBox buttonBox = new HBox();
         comboBox = new ComboBox<String>();
         comboBox.getItems().add("Automne");
@@ -90,6 +91,7 @@ public class GUIClientApp extends Application {
         buttonBox.getChildren().addAll(comboBox, charger);
 
         // ================ event-handler pour le bouton de chargement ================
+
         charger.setOnMouseClicked((event) -> {
             chargerEvent();
         });
@@ -227,13 +229,13 @@ public class GUIClientApp extends Application {
     }
 
     /**
-     * Get registration info registration form.
+     * prend les informations entree par l'utilisateur et retourne la forme d'inscription
      *
-     * @return the registration form
+     * @return un objet RegistrationForm
      */
     static public RegistrationForm getRegistrationInfo(){
-        // read the fields of each Textfield and return a registration form
-        // reads the class from the "currently pressed" value on the table
+
+        // ================ lecture de tout les TextFields ================
 
         String prenom = prenomTextField.getText();
         String nom = nomTextField.getText();
@@ -244,25 +246,25 @@ public class GUIClientApp extends Application {
     }
 
     /**
-     * Get course list session info string.
+     * Trouve la session active en ce moment sur le GUI
      *
      * @return the string
      */
     static public String getCourseListSessionInfo(){
-        // reads the session label from the stopdown menu button and sends it back
+        // ================ Lecture de la Combobox pour trouver la session ================
         String session = (String) comboBox.getValue();
         System.out.println("asked session is " + session);
         return session;
     }
 
     /**
-     * Process registration response.
+     * prise en charge de la reponse d'inscription du serveur
      *
-     * @param response the response
-     * @param stage    the stage
+     * @param response la reponse du serveur
+     * @param stage    la Stage actuel
      */
     static public void processRegistrationResponse(String response, Stage stage){
-        // opens a new message window with the response
+        // ================ on ouvre une nouvelle fenetre avec le message ================
         System.out.println(response);
         showPopupWindow(response, stage);
     }
@@ -274,40 +276,34 @@ public class GUIClientApp extends Application {
      * @param cours   the cours
      */
     static public void processCourseListResponse(String session, ArrayList<Course> cours){
-        // modifies the table (erasing all previous entries) to display the course list
+        // ================ on dit a la table d'utiliser l'array cours ================
         activeCourses = cours;
         table.setItems(FXCollections.observableArrayList(activeCourses));
-        System.out.println(cours.toString());
     }
 
     /**
-     * Show popup window.
+     * methode qui ouvre une nouvelle fenetre et ecrit un message
      *
-     * @param message the message
-     * @param owner   the owner
+     * @param message le message a imprimer
+     * @param owner   le Stage principal
      */
     static public void showPopupWindow(String message, Stage owner) {
-        // Create a new Stage for the popup window
-        Stage popupWindow = new Stage();
 
-        // Set the properties of the popup window
+        // ================ creation d'un nouveau stage ================
+        Stage popupWindow = new Stage();
         popupWindow.initModality(Modality.WINDOW_MODAL);
         popupWindow.initOwner(owner);
-        popupWindow.setTitle("Popup Window");
+        popupWindow.setTitle("Message");
 
-        // Create a Label to display the message
+        // ================ creation de l'element du message ================
         Label messageLabel = new Label(message);
-
-        // Create a VBox to hold the Label
         VBox root = new VBox(messageLabel);
         root.setSpacing(10);
         root.setPadding(new Insets(10));
 
-        // Create a Scene with the VBox and set it as the popup window's scene
+        // ================ on cree une nouvelle scene ================
         Scene popupScene = new Scene(root, 500, 60);
         popupWindow.setScene(popupScene);
-
-        // Show the popup window
         popupWindow.showAndWait();
     }
 }

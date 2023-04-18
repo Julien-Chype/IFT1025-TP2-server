@@ -298,9 +298,11 @@ public class Server {
             //vérification de doublon
             while ( ( ligne = reader.readLine()) != null ){
                 String[] parts = ligne.split("\t") ;
-                if (parts[2].equals(matricule) && parts[1].equals(sigle)){
-                   estConforme = false ;
-                   reponse = "Échec de l'inscription, l'étudiant est déjà inscrit" ;
+                if (parts.length > 2) {
+                    if (parts[2].equals(matricule) && parts[1].equals(sigle)){
+                        estConforme = false ;
+                        reponse = "Échec de l'inscription, l'étudiant est déjà inscrit" ;
+                    }
                 }
             }
         }catch (IOException e){

@@ -15,19 +15,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * The type Client.
+ * La classe client qui interface avec le serveur pour l'application sur ligne de commande
  */
 public class Client {
-    /*
-    This handles waiting around for the server to respond, maintains a client View to display, along with
-
-    - the views need to be able to
-    1. wait for user to choose Session, Course, input their names, etc.
-    2. provide output messages that show the server output
-
-    This class calls the views to make this happen, and waits around for the server to
-
-     */
     private Socket client ;
     private ObjectInputStream input ;
     private ObjectOutputStream output ;
@@ -36,11 +26,11 @@ public class Client {
     private String HOST ;
 
     /**
-     * Instantiates a new Client.
+     * creation d'un nouveau Client
      *
-     * @param port the port
-     * @param view the view
-     * @param host the host
+     * @param port le port
+     * @param view la view
+     * @param host le host
      */
     public Client(int port, CLIClientView view, String host){
 
@@ -50,13 +40,15 @@ public class Client {
     }
 
     /**
-     * Establish connection.
+     * etablir une connection avec le serveur
      *
      * @param port the port
      * @param host the host
      */
     public void establishConnection(int port, String host){
-        // creation du socket
+
+        // ================ creation du socket ================
+
         try {
             client = new Socket(host, port);
         }
@@ -64,7 +56,9 @@ public class Client {
             System.out.println("Échec de la connection au serveur de l'UDEM");
             System.exit(0) ;
         }
-        // creation des input et output stream
+
+        // ================ creation des input et output stream ================
+
         try {
             input = new ObjectInputStream(client.getInputStream());
             output = new ObjectOutputStream(client.getOutputStream());
@@ -75,15 +69,9 @@ public class Client {
     }
 
     /**
-     * Run.
+     * method principale de la logique du client de ligne de commande
      */
     public void run(){
-        // this is the function that calls the view to get the registration form
-        // that sends back the responses from the server to the view for visualization
-        // need to setup events here, the view would callback to tell us whether we register or request courses.
-
-        // while: wait for command type from view
-        // then send back data to view depending on command to visualize it.
         boolean stop = false;
 
         while(!stop){

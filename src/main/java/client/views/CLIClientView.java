@@ -12,7 +12,7 @@ import java.util.Scanner;
 import java.lang.System ;
 
 /**
- * The type Cli client view.
+ * Classe qui definie une View pour l'interface sur terminal du client
  */
 public class CLIClientView{
 
@@ -20,6 +20,9 @@ public class CLIClientView{
     private static String choixSession ;
 
     private String getUserString(String demande){
+
+        // ================ Lecture du terminal d'un string ================
+
         String input = "";
         System.out.println("Veuiller saisir " + demande + ": ") ;
         try {input = scanner.nextLine() ;}
@@ -28,6 +31,9 @@ public class CLIClientView{
     }
 
     private int getUserInt(int maxIntAllowed){
+
+        // ================ Lecture du terminal d'un nombre entre 1 et maxIntAllowed ================
+
         int choix = -1 ;
         try { choix = Integer.parseInt(scanner.nextLine()); }
         catch(Exception e){ System.out.println("Svp entrez un choix valide\n") ; getUserInt(maxIntAllowed) ; }
@@ -40,6 +46,8 @@ public class CLIClientView{
 
     public String waitForNextCommand(){
 
+        // ================ attente pour la prochaine commande du terminal ================
+
         System.out.println("\n1. Consulter les cours offerts pour une session\n2. Inscription à un cours\n> Choix: ") ;
         int decision  = getUserInt(2) ;
 
@@ -50,7 +58,9 @@ public class CLIClientView{
         }
     }
     public RegistrationForm getRegistrationInfo(){
-        // prompts the user to enter registration info
+
+        // ================ Lecture du terminal de tout les champs de la forme d'inscription ================
+
         String prenom = getUserString("votre prénom");
         String nom = getUserString("votre nom");
         String email = getUserString("votre email");
@@ -62,7 +72,9 @@ public class CLIClientView{
         return new RegistrationForm(prenom, nom, email, matricule, course);
     }
     public String getCourseListSessionInfo(){
-        // prompts the user to select the session for the requested course list
+
+        // ================ Lecture du terminal de la session de cours desiree ================
+
         System.out.println("Veuillez choisir la session pour laquelle vous voulez consulter la liste des cours:\n1. Automne\n2. Hiver\n3. Ete\n") ;
 
         int choix = getUserInt(3) ;
@@ -72,11 +84,15 @@ public class CLIClientView{
         return sessions[choix-1];
     }
     public void processRegistrationResponse(String response){
-        // just prints the registration response from the server
+
+        // ================ impression au terminal de la reponse ================
+
         System.out.println(response);
     }
     public void processCourseListResponse(String session, ArrayList<Course> cours){
-        // takes the arraylist of courses and prints it to screen
+
+        // ================ impression au terminal des cours disponibles ================
+
         System.out.println("Les cours offerts pendant la session d'" + session + " sont:");
         for(int i = 0; i<cours.size(); i++){
             Course course = cours.get(i);
