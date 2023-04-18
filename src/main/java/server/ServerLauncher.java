@@ -1,5 +1,7 @@
 package server;
 
+import java.net.BindException;
+
 /**
  * Classe qui lance le serveur
  */
@@ -16,13 +18,19 @@ public class ServerLauncher {
      */
     public static void main(String[] args) {
         Server server;
-        try {
-            // ================ creation et lancement d'un nouveau serveur ================
-            server = new Server(PORT);
-            System.out.println("Server is running...");
-            server.run();
-        } catch (Exception e) {
-            e.printStackTrace();
+        while (true) {
+            try {
+                // ================ creation et lancement d'un nouveau serveur ================
+                server = new Server(PORT);
+                System.out.println("Server is running...");
+                server.run();
+            }
+            catch( BindException e){
+                ; // ne fait rien, sert à éviter une impression répétitive de la tentative de réouverture du serveur
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

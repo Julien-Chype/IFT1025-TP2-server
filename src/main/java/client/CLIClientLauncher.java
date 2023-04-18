@@ -24,15 +24,15 @@ public class CLIClientLauncher {
      */
     public static void main(String[] args) {
         Client client;
-        try {
+            try {
 
-            CLIClientView view = new CLIClientView();
-            client = new Client(PORT, view, HOST);
-            System.out.println("client is running...");
-            System.out.println("*** Bienvenue au portail d'inscription de cours de l'UDEM ***") ;
-            client.run();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                CLIClientView view = new CLIClientView();
+                client = new Client(PORT, view, HOST);
+                System.out.println("client is running...");
+                System.out.println("*** Bienvenue au portail d'inscription de cours de l'UDEM ***");
+                client.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 }

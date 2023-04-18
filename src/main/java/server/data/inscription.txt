@@ -1,3 +1,2 @@
-Automne	IFT1015	11	C	R	w@2
-Automne	IFT2255	11	C	R	w@2
-Automne	IFT1227	11	C	R	w@2
+Automne	IFT1015	f	asdf	sadfa	a
+Automne	IFT1015	aksdjf	asdf	sadkf	jaskdf@asdf
