@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.lang.System ;
 
-public class CLIClientView extends ClientView{
+public class CLIClientView implements ClientView{
 
     private final static Scanner scanner = new Scanner(System.in);
     private static String choixSession ;

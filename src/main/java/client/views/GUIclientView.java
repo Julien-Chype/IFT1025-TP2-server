@@ -1,6 +1,6 @@
 package client.views;
 
-//import client.GUIClientLauncher;
+import client.controllers.Client;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,11 +10,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import server.models.Course;
+import server.models.RegistrationForm;
 
-public class GUIclientApp extends Application {
+import java.util.ArrayList;
 
-    public Scene scene;
-    public HBox root;
+public class GUIclientView extends Application implements ClientView {
+
+    public final static int PORT = 1337;
+    static void main(String[] args){
+        Client client;
+        client = new Client(PORT, view);
+        client.run();
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -104,5 +113,28 @@ public class GUIclientApp extends Application {
         primaryStage.setTitle("Inscription UdeM");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public String waitForNextCommand(){
+        // this sets up the button waiters
+        return "";
+    }
+    public RegistrationForm getRegistrationInfo(){
+        // reads the registration info from the forms in the GUI and sends them to controller
+        return new RegistrationForm("", "", "", "", new Course("","",""));
+    }
+    public String getCourseListSessionInfo(){
+        // reads the session label from the stopdown menu button and sends it back
+        return "";
+    }
+    public void processRegistrationResponse(String response){
+        // prints the confirmation message below the "enovyer" button
+
+    }
+    public void processCourseListResponse(ArrayList<Course> cours){
+        // prints the courses in the content table
+    }
+    public void processCourseListResponse(String session, ArrayList<Course> cours){
+
     }
 }

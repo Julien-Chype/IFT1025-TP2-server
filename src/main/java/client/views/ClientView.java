@@ -5,7 +5,7 @@ import server.models.RegistrationForm;
 
 import java.util.ArrayList;
 
-public abstract class ClientView {
+public interface ClientView {
 
     public abstract String waitForNextCommand();
     public abstract RegistrationForm getRegistrationInfo();

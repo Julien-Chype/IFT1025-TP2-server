@@ -1,5 +1,7 @@
 
 next:
+- make new GUIClient that calls the static GUIclientView class functions
+- write event trackers in the GUI app which modify private variables
 - write the GUIClientView and debug that
 - try to compile into jars and fix all the errors
 - generate javadocs on everything
