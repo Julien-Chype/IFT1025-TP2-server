@@ -1,6 +1,6 @@
 package client.controllers;
 
-import client.views.ClientView;
+import client.GUIClientApp;
 import server.models.Course;
 import server.models.RegistrationForm;
 
@@ -12,20 +12,9 @@ import java.util.ArrayList;
 
 public class GUIClient {
 
-    /*
-    This handles waiting around for the server to respond, maintains a client View to display, along with
-
-    - the views need to be able to
-    1. wait for user to choose Session, Course, input their names, etc.
-    2. provide output messages that show the server output
-
-    This class calls the views to make this happen, and waits around for the server to
-
-     */
     private Socket client ;
     private ObjectInputStream input ;
     private ObjectOutputStream output ;
-    private ClientView view;
     private int PORT ;
     private String HOST ;
     public GUIClient(int port, String host){
@@ -52,39 +41,7 @@ public class GUIClient {
         }
     }
 
-    public void run(){
-        // this is the function that calls the view to get the registration form
-        // that sends back the responses from the server to the view for visualization
-        // need to setup events here, the view would callback to tell us whether we register or request courses.
-
-        // while: wait for command type from view
-        // then send back data to view depending on command to visualize it.
-        boolean stop = false;
-
-        while(!stop){
-            establishConnection(PORT, HOST);
-
-            String command = view.waitForNextCommand();
-
-            switch (command) {
-
-                case "INSCRIRE":
-                    // here we need to get the inscription info from the current view
-                    RegistrationForm forme = view.getRegistrationInfo();
-                    String response = sendRegistrationRequest(forme);
-                    view.processRegistrationResponse(response);
-                    break;
-
-                case "CHARGER":
-                    String session = view.getCourseListSessionInfo();
-                    ArrayList<Course> cours = sendCourseListRequest(session);
-                    view.processCourseListResponse(session, cours);
-                    break;
-            }
-        }
-    }
-
-    private String waitForRegistrationResponse(){
+    public String waitForRegistrationResponse(){
 
         String response = "";
 
@@ -99,7 +56,7 @@ public class GUIClient {
         return response;
     }
 
-    private ArrayList<Course> waitForClassListRequestResponse(){
+    public ArrayList<Course> waitForClassListRequestResponse(){
         ArrayList<Course> cours = new ArrayList<>();
 
         try {
@@ -113,7 +70,7 @@ public class GUIClient {
         return cours;
     }
 
-    private String sendRegistrationRequest(RegistrationForm forme){
+    public String sendRegistrationRequest(RegistrationForm forme){
         String message = "";
         try{
             output.writeObject("INSCRIRE");
@@ -126,7 +83,7 @@ public class GUIClient {
         return message;
     }
 
-    private ArrayList<Course> sendCourseListRequest(String session){
+    public ArrayList<Course> sendCourseListRequest(String session){
         ArrayList<Course> cours = new ArrayList<Course>();
         try{
             output.writeObject("CHARGER " + session);

@@ -19,10 +19,11 @@ public class GUIClientApp extends Application {
 
     public final static int PORT = 1337;
     public final static String HOST = "127.0.0.1";
+
+    public static GUIClient client;
+
     static void main(String[] args){
-        GUIClient client;
         client = new GUIClient(PORT, HOST);
-        client.run();
         launch(args);
     }
 
@@ -46,6 +47,11 @@ public class GUIClientApp extends Application {
         comboBox.getItems().add("Ete");
         Button charger = new Button("charger");
         buttonBox.getChildren().addAll(comboBox, charger);
+
+        // event handler for charger button press
+        charger.setOnMouseClicked((event) -> {
+            inscrireEvent();
+        });
 
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setSpacing(10);
@@ -98,6 +104,11 @@ public class GUIClientApp extends Application {
 
         Button envoyer = new Button("envoyer");
 
+        // event handler for envoyer button press
+        envoyer.setOnMouseClicked((event) -> {
+            chargerEvent();
+        });
+
         rightSide.getChildren().add(envoyer);
         rightSide.setAlignment(Pos.CENTER);
         rightSide.setSpacing(10);
@@ -116,26 +127,37 @@ public class GUIClientApp extends Application {
         primaryStage.show();
     }
 
-    static String waitForNextCommand(){
+    static public void inscrireEvent(){
+        client.establishConnection(PORT, HOST);
+        RegistrationForm forme = getRegistrationInfo();
+        String response = client.sendRegistrationRequest(forme);
+        processRegistrationResponse(response);
+    }
+
+    static public void chargerEvent(){
+        client.establishConnection(PORT, HOST);
+        String session = getCourseListSessionInfo();
+        ArrayList<Course> cours = client.sendCourseListRequest(session);
+        processCourseListResponse(session, cours);
+    }
+
+    static public String waitForNextCommand(){
         // this sets up the button waiters
         return "";
     }
-    static RegistrationForm getRegistrationInfo(){
+    static public RegistrationForm getRegistrationInfo(){
         // reads the registration info from the forms in the GUI and sends them to controller
         return new RegistrationForm("", "", "", "", new Course("","",""));
     }
-    static String getCourseListSessionInfo(){
+    static public String getCourseListSessionInfo(){
         // reads the session label from the stopdown menu button and sends it back
         return "";
     }
-    static void processRegistrationResponse(String response){
+    static public void processRegistrationResponse(String response){
         // prints the confirmation message below the "enovyer" button
 
     }
-    static void processCourseListResponse(ArrayList<Course> cours){
-        // prints the courses in the content table
-    }
-    static void processCourseListResponse(String session, ArrayList<Course> cours){
+    static public void processCourseListResponse(String session, ArrayList<Course> cours){
 
     }
 }
