@@ -2,9 +2,12 @@ package client;
 
 import client.controllers.GUIClient;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -22,7 +25,20 @@ public class GUIClientApp extends Application {
 
     public static GUIClient client;
 
-    static void main(String[] args){
+    private static TextField prenomTextField;
+    private static TextField nomTextField;
+    private static TextField emailTextField;
+    private static TextField matriculeTextField;
+
+    private static ComboBox<String> comboBox;
+
+    private static TableView<Course> table;
+
+    private static ArrayList<Course> activeCourses = new ArrayList<Course>();
+
+    private static Course selectedCourse;
+
+    public static void main(String[] args){
         client = new GUIClient(PORT, HOST);
         launch(args);
     }
@@ -41,7 +57,7 @@ public class GUIClientApp extends Application {
         courseListText.setFont(Font.font("serif", 20));
 
         HBox buttonBox = new HBox();
-        ComboBox comboBox = new ComboBox();
+        comboBox = new ComboBox<String>();
         comboBox.getItems().add("Automne");
         comboBox.getItems().add("Hiver");
         comboBox.getItems().add("Ete");
@@ -50,17 +66,29 @@ public class GUIClientApp extends Application {
 
         // event handler for charger button press
         charger.setOnMouseClicked((event) -> {
-            inscrireEvent();
+            chargerEvent();
         });
 
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setSpacing(10);
 
-        TableView table = new TableView();
+        table = new TableView<Course>();
         table.setEditable(true);
-        TableColumn codeCol = new TableColumn("Code");
-        TableColumn coursCol = new TableColumn("Cours");
+        TableColumn<Course, String> codeCol = new TableColumn<>("Code");
+        TableColumn<Course, String> coursCol = new TableColumn<>("Cours");
+
+        codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
+        coursCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
         table.getColumns().addAll(codeCol, coursCol);
+
+        table.setItems(FXCollections.observableArrayList(activeCourses));
+
+        table.setOnMouseClicked((event) -> {
+            if (event.getClickCount() > 0) {
+                selectedCourse = table.getSelectionModel().getSelectedItem();
+            }
+        });
 
         leftSide.getChildren().addAll(courseListText, table, buttonBox, new Separator());
 
@@ -75,28 +103,28 @@ public class GUIClientApp extends Application {
         rightSide.getChildren().add(registerText);
 
         Text prenom = new Text("Prenom");
-        TextField prenomTextField = new TextField();
+        prenomTextField = new TextField();
         HBox prenomBox = new HBox();
         prenomBox.getChildren().addAll(prenom, prenomTextField);
         prenomBox.setAlignment(Pos.CENTER);
         rightSide.getChildren().add(prenomBox);
 
         Text nom = new Text("Nom");
-        TextField nomTextField = new TextField();
+        nomTextField = new TextField();
         HBox nomBox = new HBox();
         nomBox.getChildren().addAll(nom, nomTextField);
         nomBox.setAlignment(Pos.CENTER);
         rightSide.getChildren().add(nomBox);
 
         Text email = new Text("Email");
-        TextField emailTextField = new TextField();
+        emailTextField = new TextField();
         HBox emailBox = new HBox();
         emailBox.getChildren().addAll(email, emailTextField);
         emailBox.setAlignment(Pos.CENTER);
         rightSide.getChildren().add(emailBox);
 
         Text matricule = new Text("Matricule");
-        TextField matriculeTextField = new TextField();
+        matriculeTextField = new TextField();
         HBox matriculeBox = new HBox();
         matriculeBox.getChildren().addAll(matricule, matriculeTextField);
         matriculeBox.setAlignment(Pos.CENTER);
@@ -106,7 +134,7 @@ public class GUIClientApp extends Application {
 
         // event handler for envoyer button press
         envoyer.setOnMouseClicked((event) -> {
-            chargerEvent();
+            inscrireEvent();
         });
 
         rightSide.getChildren().add(envoyer);
@@ -141,23 +169,32 @@ public class GUIClientApp extends Application {
         processCourseListResponse(session, cours);
     }
 
-    static public String waitForNextCommand(){
-        // this sets up the button waiters
-        return "";
-    }
     static public RegistrationForm getRegistrationInfo(){
-        // reads the registration info from the forms in the GUI and sends them to controller
-        return new RegistrationForm("", "", "", "", new Course("","",""));
+        // read the fields of each Textfield and return a registration form
+        // reads the class from the "currently pressed" value on the table
+
+        String prenom = prenomTextField.getText();
+        String nom = nomTextField.getText();
+        String email = emailTextField.getText();
+        String matricule = matriculeTextField.getText();
+
+        return new RegistrationForm(prenom, nom, email, matricule, selectedCourse);
     }
     static public String getCourseListSessionInfo(){
         // reads the session label from the stopdown menu button and sends it back
-        return "";
+        String session = (String) comboBox.getValue();
+        System.out.println("asked session is " + session);
+        return session;
     }
     static public void processRegistrationResponse(String response){
-        // prints the confirmation message below the "enovyer" button
+        // opens a new message window with the response
+        System.out.println(response);
 
     }
     static public void processCourseListResponse(String session, ArrayList<Course> cours){
-
+        // modifies the table (erasing all previous entries) to display the course list
+        activeCourses = cours;
+        table.setItems(FXCollections.observableArrayList(activeCourses));
+        System.out.println(cours.toString());
     }
 }

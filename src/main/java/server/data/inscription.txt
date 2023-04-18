@@ -1,2 +1,4 @@
 Automne	IFT1015	1	C	R	1
 Automne	IFT2255	1	c	r	1
+Ete	IFT2256	22	Ciuca	Raz	a@u
+Automne	IFT1015	22	C	Raz	a@e

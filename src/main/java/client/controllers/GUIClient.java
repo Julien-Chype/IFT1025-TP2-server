@@ -50,6 +50,7 @@ public class GUIClient {
         }
         catch (Exception e){
             System.out.println("erreur lors de la reception de la reponse du serveur pour l'inscription");
+            e.printStackTrace();
             System.exit(0) ;
         }
 
