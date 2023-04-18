@@ -253,7 +253,6 @@ public class GUIClientApp extends Application {
     static public String getCourseListSessionInfo(){
         // ================ Lecture de la Combobox pour trouver la session ================
         String session = (String) comboBox.getValue();
-        System.out.println("asked session is " + session);
         return session;
     }
 

@@ -274,6 +274,7 @@ public class Server {
             }
         }
         if (!coursExiste){
+            estConforme = false;
             reponse = "Échec de l'inscription, le cours n'existe pas";
         }
 
