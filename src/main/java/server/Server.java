@@ -87,11 +87,11 @@ public class Server {
     public void listen() throws IOException, ClassNotFoundException {
         String line;
         if ((line = this.objectInputStream.readObject().toString()) != null) {
-            System.out.println(line);
+            System.out.println(line); //debug
             Pair<String, String> parts = processCommandLine(line);
             String cmd = parts.getKey();
             String arg = parts.getValue();
-            System.out.println(cmd + " " + arg);
+            System.out.println(cmd + " " + arg); //debug
             this.alertHandlers(cmd, arg);
         }
     }

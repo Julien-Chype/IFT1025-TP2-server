@@ -75,17 +75,14 @@ public class Client {
                     RegistrationForm forme = view.getRegistrationInfo();
                     String response = sendRegistrationRequest(forme);
                     view.processRegistrationResponse(response);
+                    stop = true;
+                    disconnect();
                     break;
 
                 case "CHARGER":
                     String session = view.getCourseListSessionInfo();
                     ArrayList<Course> cours = sendCourseListRequest(session);
                     view.processCourseListResponse(session, cours);
-                    break;
-
-                case "QUITTER":
-                    stop = true;
-                    disconnect();
                     break;
             }
         }
