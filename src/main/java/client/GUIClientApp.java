@@ -4,6 +4,7 @@ import client.controllers.GUIClient;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -12,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import server.models.Course;
 import server.models.RegistrationForm;
@@ -36,7 +38,7 @@ public class GUIClientApp extends Application {
 
     private static ArrayList<Course> activeCourses = new ArrayList<Course>();
 
-    private static Course selectedCourse;
+    private static Course selectedCourse = new Course("", "", "");
 
     public static void main(String[] args){
         client = new GUIClient(PORT, HOST);
@@ -83,6 +85,7 @@ public class GUIClientApp extends Application {
         table.getColumns().addAll(codeCol, coursCol);
 
         table.setItems(FXCollections.observableArrayList(activeCourses));
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         table.setOnMouseClicked((event) -> {
             if (event.getClickCount() > 0) {
@@ -134,7 +137,7 @@ public class GUIClientApp extends Application {
 
         // event handler for envoyer button press
         envoyer.setOnMouseClicked((event) -> {
-            inscrireEvent();
+            inscrireEvent(primaryStage);
         });
 
         rightSide.getChildren().add(envoyer);
@@ -148,18 +151,19 @@ public class GUIClientApp extends Application {
 
         root.getChildren().addAll(sep1, leftSide, sep2, rightSide);
         root.setSpacing(20);
+        root.setAlignment(Pos.CENTER);
 
-        Scene scene = new Scene(root, 600, 300);
+        Scene scene = new Scene(root, 800, 500);
         primaryStage.setTitle("Inscription UdeM");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    static public void inscrireEvent(){
+    static public void inscrireEvent(Stage stage){
         client.establishConnection(PORT, HOST);
         RegistrationForm forme = getRegistrationInfo();
         String response = client.sendRegistrationRequest(forme);
-        processRegistrationResponse(response);
+        processRegistrationResponse(response, stage);
     }
 
     static public void chargerEvent(){
@@ -186,15 +190,40 @@ public class GUIClientApp extends Application {
         System.out.println("asked session is " + session);
         return session;
     }
-    static public void processRegistrationResponse(String response){
+    static public void processRegistrationResponse(String response, Stage stage){
         // opens a new message window with the response
         System.out.println(response);
-
+        showPopupWindow(response, stage);
     }
     static public void processCourseListResponse(String session, ArrayList<Course> cours){
         // modifies the table (erasing all previous entries) to display the course list
         activeCourses = cours;
         table.setItems(FXCollections.observableArrayList(activeCourses));
         System.out.println(cours.toString());
+    }
+
+    static public void showPopupWindow(String message, Stage owner) {
+        // Create a new Stage for the popup window
+        Stage popupWindow = new Stage();
+
+        // Set the properties of the popup window
+        popupWindow.initModality(Modality.WINDOW_MODAL);
+        popupWindow.initOwner(owner);
+        popupWindow.setTitle("Popup Window");
+
+        // Create a Label to display the message
+        Label messageLabel = new Label(message);
+
+        // Create a VBox to hold the Label
+        VBox root = new VBox(messageLabel);
+        root.setSpacing(10);
+        root.setPadding(new Insets(10));
+
+        // Create a Scene with the VBox and set it as the popup window's scene
+        Scene popupScene = new Scene(root, 500, 60);
+        popupWindow.setScene(popupScene);
+
+        // Show the popup window
+        popupWindow.showAndWait();
     }
 }
