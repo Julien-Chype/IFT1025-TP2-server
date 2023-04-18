@@ -144,10 +144,8 @@ public class Server {
 
         BufferedReader reader ;
 
-        //debug #todo , nécessité de tester la session ? car l'appel à cette méthode est fait par
-        // une méthode interne, donc pas sensé recevoir autres choses
+        // ================   Vérifie que l'argument est une session valide ================
 
-        //Vérifie que l'argument est valide
         boolean test = false ;
         String[] session = {"Ete", "Hiver", "Automne"} ;
 
@@ -159,7 +157,8 @@ public class Server {
         }
         if (!test){ throw new IllegalArgumentException("L'argument n'est pas une session valide") ;}
 
-        //ouverture du document texte contenu les cours
+        // ================ ouverture du document cours.txt ================
+
         try {
             reader = new BufferedReader( new FileReader("src/main/java/server/data/cours.txt")) ;
         } catch (IOException e) {
@@ -167,8 +166,8 @@ public class Server {
             throw new IOException("Erreur à l'ouverture du fichier 'cours.txt'");
         }
 
-        //Extrait seulement les lignes  contenant la bonne session et construit la liste
-        //à remettre au client
+        // ================ construction de la liste des cours a remettre au client ================
+
         ArrayList<Course> cours = new ArrayList<Course>() ;
 
         String ligne ;
@@ -185,9 +184,8 @@ public class Server {
             throw new IOException("Erreur lors de la fermeture de 'cours.txt'") ;
         }
 
-        //remise du ArrayList<Course> au client
+        // ================ remise du ArrayList<Course> au client ================
         try {
-            System.out.println("sending courses over");
             objectOutputStream.writeObject(cours);
         } catch(IOException e){
             throw new IOException("Erreur d'output lors de l'envoie de la liste de cours filtrée") ;
@@ -202,7 +200,9 @@ public class Server {
      * l'écriture dans un fichier ou dans le flux de sortie.
      */
     public void handleRegistration() throws IOException {
-        //premier Objet est déjà lu, cest la requête, la on lit le 2e objet, le registrationForm
+
+        // ================ lecture de l'objet RegistrationForm du Stream ================
+
         RegistrationForm forme ;
         String reponse ;
         boolean estConforme = true;
@@ -211,8 +211,8 @@ public class Server {
         }catch(IOException | ClassNotFoundException e){
            throw new IOException("Erreur à la réception du registre d'inscription") ;
         }
-        //la forme est sensé ressembler à cela:
-        //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
+
+        // ================ lecture des champs de la forme recue ================
 
         String sigle = forme.getCourse().getCode();
         String matricule = forme.getMatricule();
@@ -221,14 +221,26 @@ public class Server {
         String prenom = forme.getPrenom() ;
         String session = "";
 
+        // reponse de base a renvoyer au client si aucun problem n'es trouve par la suite
         reponse = "Félicitation! Incription réussi au réussi de " + prenom + " au cours " + sigle + "\n" ;
+
+        // ================ verification de la comformite des champs ================
 
         if (email.split("@").length != 2){
             reponse = "veuillez entrer une addresse email valide";
             estConforme = false;
         }
+        if (matricule.length() == 0){
+            reponse = "veuillez entrer un matricule valide";
+            estConforme = false;
+        }
+        if (nom.length() == 0 || prenom.length() == 0){
+            reponse = "veuillez entrer un nom et prenom valide";
+            estConforme = false;
+        }
 
-        //vérifier que le cours existe
+        // ================ verification que le cours existe ================
+
         BufferedReader reader ;
         try {
             reader = new BufferedReader( new FileReader("src/main/java/server/data/cours.txt") ) ;
@@ -236,7 +248,6 @@ public class Server {
             throw new IOException("Erreur à l'ouverture du fichier 'cours.txt'");
         }
 
-        //Parcours tous les cours pour vérifier si le sigle correspond
         String ligne ;
         boolean coursExiste = false;
         while ( (ligne = reader.readLine()) != null ){
@@ -258,13 +269,17 @@ public class Server {
             throw new IOException("Erreur lors de la fermeture de 'cours.txt'") ;
         }
 
-        //iscription dans le fichier, et vérificatio que pas déjà inscrit
+
+        // ================ ouverture du fichier d'inscription ================
+
         try {
             reader = new BufferedReader(new FileReader("src/main/java/server/data/inscription.txt"));
         }catch (IOException e){
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }
-        //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
+
+        // ================ verification que l'etudient n'est pas deja inscrit ================
+
         try {
             //vérification de doublon
             while ( ( ligne = reader.readLine()) != null ){
@@ -279,7 +294,7 @@ public class Server {
         }
         reader.close();
 
-        // ouvrir le writer
+        // ================ ouverture du fichier d'inscription pour ecrire ================
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter("src/main/java/server/data/inscription.txt", true));
@@ -287,7 +302,7 @@ public class Server {
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }
 
-        // ecrire au fichier
+        // ================ ecriture au fichier ================
         try{
             if (estConforme) {
                 writer.write(session + "\t" + sigle + '\t' + matricule + '\t' + nom + '\t' + prenom + '\t' + email + '\n'); }
@@ -296,13 +311,12 @@ public class Server {
         }
         writer.close();
 
-        //envoie de la réponse de réussi ou non au client
-       try {
-           System.out.println("sending response over");
-           objectOutputStream.writeObject(reponse);
-       } catch(IOException e){
-           throw new IOException("Envoie de la réponse au client a échoué" );
-       }
+        // ================ envoi de la reponse au client ================
+        try {
+            objectOutputStream.writeObject(reponse);
+        } catch(IOException e){
+            throw new IOException("Envoie de la réponse au client a échoué" );
+        }
     }
 }
 

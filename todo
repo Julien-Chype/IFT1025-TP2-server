@@ -1,13 +1,12 @@
 
 next:
-- make new GUIClient that calls the static GUIclientView class functions
-- make sure everything compiles correctly
-- make sure the CLIclient still works as expected
-- write event trackers in the GUI app which modify private variables
-- try to compile into jars and fix all the errors
-- generate javadocs on everything
-- change variable names and divide code into easy sections for visualization
-- make mp4 video
+- fix error behavior in Server, name email etc. must be correct
+- Go through all classes, making comments and function descriptors
+    - remove useless print statements
+- generate javadoc for everything
+- generate correct jars
+- make mp4 video.
+- put everything in a zip file and send
 
 
 
