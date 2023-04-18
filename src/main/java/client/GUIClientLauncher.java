@@ -1,23 +1,21 @@
 package client;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-import javafx.scene.*;
+import client.controllers.*;
+import client.views.*;
 
-public class GUIClientLauncher extends Application {
+public class GUIClientLauncher {
+
+    public final static int PORT = 1337;
+
     public static void main(String[] args) {
-        GUIClientLauncher.launch(args);
-    }
-    @Override
-    public void start(Stage primaryStage) {
-//        VBox root = new VBox();
-//        Scene scene = new Scene(root, 320, 250);
-//        Text texte = new Text("Hello, World !");
-//        texte.setFont(Font.font("serif", 25));
-//        root.getChildren().add(texte);
-//
-//        primaryStage.setTitle("Titre de la fenêtre");
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
+        Client client;
+        try {
+
+            GUIClientView view = new GUIClientView(args);
+            client = new Client(PORT, view);
+            client.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

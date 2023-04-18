@@ -1,5 +1,6 @@
 package client.views;
 
+import client.GUIClientLauncher;
 import server.models.Course;
 import server.models.RegistrationForm;
 
@@ -8,9 +9,15 @@ import java.util.ArrayList;
 public class GUIClientView extends ClientView{
     // this is gonna maintain an Application instance?
 
+    private GUIclientApp app;
+
+    public GUIClientView(String[] args){
+        app = new GUIclientApp();
+        GUIclientApp.launch(args);
+    }
 
     public String waitForNextCommand(){
-        // waits for either the "charger" or "envoyer" buttons to be pressed
+        // this sets up the button waiters
         return "";
     }
     public RegistrationForm getRegistrationInfo(){
