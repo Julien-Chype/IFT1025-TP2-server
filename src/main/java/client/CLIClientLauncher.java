@@ -3,11 +3,25 @@ package client;
 import client.controllers.*;
 import client.views.*;
 
+/**
+ * The type Cli client launcher.
+ */
 public class CLIClientLauncher {
 
+    /**
+     * The constant PORT.
+     */
     public final static int PORT = 1337;
+    /**
+     * The constant HOST.
+     */
     public final static String HOST = "127.0.0.1";
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         Client client;
         try {

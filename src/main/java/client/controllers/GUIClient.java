@@ -10,6 +10,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * The type Gui client.
+ */
 public class GUIClient {
 
     private Socket client ;
@@ -17,11 +20,25 @@ public class GUIClient {
     private ObjectOutputStream output ;
     private int PORT ;
     private String HOST ;
+
+    /**
+     * Instantiates a new Gui client.
+     *
+     * @param port the port
+     * @param host the host
+     */
     public GUIClient(int port, String host){
 
         this.HOST = host ;
         this.PORT = port ;
     }
+
+    /**
+     * Establish connection.
+     *
+     * @param port the port
+     * @param host the host
+     */
     public void establishConnection(int port, String host){
         // creation du socket
         try {
@@ -41,6 +58,11 @@ public class GUIClient {
         }
     }
 
+    /**
+     * Wait for registration response string.
+     *
+     * @return the string
+     */
     public String waitForRegistrationResponse(){
 
         String response = "";
@@ -57,6 +79,11 @@ public class GUIClient {
         return response;
     }
 
+    /**
+     * Wait for class list request response array list.
+     *
+     * @return the array list
+     */
     public ArrayList<Course> waitForClassListRequestResponse(){
         ArrayList<Course> cours = new ArrayList<>();
 
@@ -71,6 +98,12 @@ public class GUIClient {
         return cours;
     }
 
+    /**
+     * Send registration request string.
+     *
+     * @param forme the forme
+     * @return the string
+     */
     public String sendRegistrationRequest(RegistrationForm forme){
         String message = "";
         try{
@@ -84,6 +117,12 @@ public class GUIClient {
         return message;
     }
 
+    /**
+     * Send course list request array list.
+     *
+     * @param session the session
+     * @return the array list
+     */
     public ArrayList<Course> sendCourseListRequest(String session){
         ArrayList<Course> cours = new ArrayList<Course>();
         try{
@@ -96,6 +135,9 @@ public class GUIClient {
         return cours;
     }
 
+    /**
+     * Disconnect.
+     */
     public void disconnect() {
         try {
             output.close();

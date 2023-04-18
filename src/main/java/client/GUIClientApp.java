@@ -20,11 +20,23 @@ import server.models.RegistrationForm;
 
 import java.util.ArrayList;
 
+/**
+ * The type Gui client app.
+ */
 public class GUIClientApp extends Application {
 
+    /**
+     * The constant PORT.
+     */
     public final static int PORT = 1337;
+    /**
+     * The constant HOST.
+     */
     public final static String HOST = "127.0.0.1";
 
+    /**
+     * The constant client.
+     */
     public static GUIClient client;
 
     private static TextField prenomTextField;
@@ -40,6 +52,11 @@ public class GUIClientApp extends Application {
 
     private static Course selectedCourse = new Course("", "", "");
 
+    /**
+     * Main.
+     *
+     * @param args the args
+     */
     public static void main(String[] args){
         client = new GUIClient(PORT, HOST);
         launch(args);
@@ -48,44 +65,53 @@ public class GUIClientApp extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        // ================ definition de l'element root ================
         HBox root = new HBox();
 
         VBox leftSide = new VBox();
         VBox rightSide = new VBox();
 
-        //populate left side ========================
+        // ===================================================================
+        // ================ addition d'element au cote gauche ================
+        // ===================================================================
 
+        // texte en haut du cote gauche
         Text courseListText = new Text("Liste des cours");
         courseListText.setFont(Font.font("serif", 20));
 
+        // ================ definition de la combobox de session et du bouton de chargement ================
         HBox buttonBox = new HBox();
         comboBox = new ComboBox<String>();
         comboBox.getItems().add("Automne");
         comboBox.getItems().add("Hiver");
         comboBox.getItems().add("Ete");
+        comboBox.getSelectionModel().selectFirst();
         Button charger = new Button("charger");
         buttonBox.getChildren().addAll(comboBox, charger);
 
-        // event handler for charger button press
+        // ================ event-handler pour le bouton de chargement ================
         charger.setOnMouseClicked((event) -> {
             chargerEvent();
         });
-
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setSpacing(10);
+
+        // ================ definition de la table de cours ================
 
         table = new TableView<Course>();
         table.setEditable(true);
         TableColumn<Course, String> codeCol = new TableColumn<>("Code");
         TableColumn<Course, String> coursCol = new TableColumn<>("Cours");
-
         codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
         coursCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         table.getColumns().addAll(codeCol, coursCol);
 
+        // ici on specifie que la table contient toujours les cours dans le arrayList activeCourses
         table.setItems(FXCollections.observableArrayList(activeCourses));
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // ================ event-handler pour la selection d'un cours ================
 
         table.setOnMouseClicked((event) -> {
             if (event.getClickCount() > 0) {
@@ -93,17 +119,24 @@ public class GUIClientApp extends Application {
             }
         });
 
-        leftSide.getChildren().addAll(courseListText, table, buttonBox, new Separator());
 
+        // ================ on additionne tout les elements au HBox gauche ================
+
+        leftSide.getChildren().addAll(courseListText, table, buttonBox, new Separator());
         leftSide.setAlignment(Pos.CENTER);
         leftSide.setSpacing(10);
 
 
-        //populate right side =======================
+        // ===================================================================
+        // ================ addition d'element au cote droit ================
+        // ===================================================================
 
+        // texte en haut du cote droit
         Text registerText = new Text("Formulaire d'inscription");
         registerText.setFont(Font.font("serif", 20));
         rightSide.getChildren().add(registerText);
+
+        // ================ Elements pour le champs Prenom ================
 
         Text prenom = new Text("Prenom");
         prenomTextField = new TextField();
@@ -112,12 +145,16 @@ public class GUIClientApp extends Application {
         prenomBox.setAlignment(Pos.CENTER);
         rightSide.getChildren().add(prenomBox);
 
+        // ================ Elements pour le champs Nom ================
+
         Text nom = new Text("Nom");
         nomTextField = new TextField();
         HBox nomBox = new HBox();
         nomBox.getChildren().addAll(nom, nomTextField);
         nomBox.setAlignment(Pos.CENTER);
         rightSide.getChildren().add(nomBox);
+
+        // ================ Elements pour le champs Email ================
 
         Text email = new Text("Email");
         emailTextField = new TextField();
@@ -126,6 +163,8 @@ public class GUIClientApp extends Application {
         emailBox.setAlignment(Pos.CENTER);
         rightSide.getChildren().add(emailBox);
 
+        // ================ Elements pour le champs Matricule ================
+
         Text matricule = new Text("Matricule");
         matriculeTextField = new TextField();
         HBox matriculeBox = new HBox();
@@ -133,18 +172,22 @@ public class GUIClientApp extends Application {
         matriculeBox.setAlignment(Pos.CENTER);
         rightSide.getChildren().add(matriculeBox);
 
-        Button envoyer = new Button("envoyer");
+        // ================ Elements et event-handler pour le bouton envoyer ================
 
-        // event handler for envoyer button press
+        Button envoyer = new Button("envoyer");
         envoyer.setOnMouseClicked((event) -> {
             inscrireEvent(primaryStage);
         });
+
+        // ================ on additionne tout les elements au HBox droit ================
 
         rightSide.getChildren().add(envoyer);
         rightSide.setAlignment(Pos.CENTER);
         rightSide.setSpacing(10);
 
-        //Merge together ========================
+        // ===================================================================
+        // ================ on combine le cote gauche et droit ================
+        // ===================================================================
 
         Separator sep1 = new Separator();
         Separator sep2 = new Separator();
@@ -153,12 +196,19 @@ public class GUIClientApp extends Application {
         root.setSpacing(20);
         root.setAlignment(Pos.CENTER);
 
+        // ================ definition finale de la scene ================
+
         Scene scene = new Scene(root, 800, 500);
         primaryStage.setTitle("Inscription UdeM");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+    /**
+     * methode apellée lorsque le bouton d'envoie d'inscription est clique
+     *
+     * @param stage le State de l'application
+     */
     static public void inscrireEvent(Stage stage){
         client.establishConnection(PORT, HOST);
         RegistrationForm forme = getRegistrationInfo();
@@ -166,6 +216,9 @@ public class GUIClientApp extends Application {
         processRegistrationResponse(response, stage);
     }
 
+    /**
+     * methode apellée lorsque le bouton de chargement de cours est clique
+     */
     static public void chargerEvent(){
         client.establishConnection(PORT, HOST);
         String session = getCourseListSessionInfo();
@@ -173,6 +226,11 @@ public class GUIClientApp extends Application {
         processCourseListResponse(session, cours);
     }
 
+    /**
+     * Get registration info registration form.
+     *
+     * @return the registration form
+     */
     static public RegistrationForm getRegistrationInfo(){
         // read the fields of each Textfield and return a registration form
         // reads the class from the "currently pressed" value on the table
@@ -184,17 +242,37 @@ public class GUIClientApp extends Application {
 
         return new RegistrationForm(prenom, nom, email, matricule, selectedCourse);
     }
+
+    /**
+     * Get course list session info string.
+     *
+     * @return the string
+     */
     static public String getCourseListSessionInfo(){
         // reads the session label from the stopdown menu button and sends it back
         String session = (String) comboBox.getValue();
         System.out.println("asked session is " + session);
         return session;
     }
+
+    /**
+     * Process registration response.
+     *
+     * @param response the response
+     * @param stage    the stage
+     */
     static public void processRegistrationResponse(String response, Stage stage){
         // opens a new message window with the response
         System.out.println(response);
         showPopupWindow(response, stage);
     }
+
+    /**
+     * Process course list response.
+     *
+     * @param session the session
+     * @param cours   the cours
+     */
     static public void processCourseListResponse(String session, ArrayList<Course> cours){
         // modifies the table (erasing all previous entries) to display the course list
         activeCourses = cours;
@@ -202,6 +280,12 @@ public class GUIClientApp extends Application {
         System.out.println(cours.toString());
     }
 
+    /**
+     * Show popup window.
+     *
+     * @param message the message
+     * @param owner   the owner
+     */
     static public void showPopupWindow(String message, Stage owner) {
         // Create a new Stage for the popup window
         Stage popupWindow = new Stage();

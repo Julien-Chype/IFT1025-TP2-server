@@ -14,6 +14,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * The type Client.
+ */
 public class Client {
     /*
     This handles waiting around for the server to respond, maintains a client View to display, along with
@@ -28,15 +31,30 @@ public class Client {
     private Socket client ;
     private ObjectInputStream input ;
     private ObjectOutputStream output ;
-    private ClientView view;
+    private CLIClientView view;
     private int PORT ;
     private String HOST ;
-    public Client(int port, ClientView view, String host){
+
+    /**
+     * Instantiates a new Client.
+     *
+     * @param port the port
+     * @param view the view
+     * @param host the host
+     */
+    public Client(int port, CLIClientView view, String host){
 
         this.HOST = host ;
         this.PORT = port ;
         this.view = view;
     }
+
+    /**
+     * Establish connection.
+     *
+     * @param port the port
+     * @param host the host
+     */
     public void establishConnection(int port, String host){
         // creation du socket
         try {
@@ -56,6 +74,9 @@ public class Client {
         }
     }
 
+    /**
+     * Run.
+     */
     public void run(){
         // this is the function that calls the view to get the registration form
         // that sends back the responses from the server to the view for visualization
@@ -142,6 +163,9 @@ public class Client {
         return cours;
     }
 
+    /**
+     * Disconnect.
+     */
     public void disconnect() {
         try {
             output.close();

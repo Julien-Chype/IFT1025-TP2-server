@@ -11,15 +11,18 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Classe Server principale
+ */
 public class Server {
 
     /**
-     *"REGISTER_COMMAND" est une constante d'un String permettant d'identifier une
+     * "REGISTER_COMMAND" est une constante d'un String permettant d'identifier une
      * certaine commande.
      */
     public final static String REGISTER_COMMAND = "INSCRIRE";
     /**
-     *"LOAD_COMMAND" est une constante d'un String permettant d'identifier une
+     * "LOAD_COMMAND" est une constante d'un String permettant d'identifier une
      * certaine commande.
      */
     public final static String LOAD_COMMAND = "CHARGER";
@@ -31,8 +34,9 @@ public class Server {
 
     /**
      * Le constructeur instancie un ServerSocket pouvant désservir un seul client à la fois
+     *
      * @param port "Port" est le port sur lequel l'application va desservir les clients
-     * @throws IOException  Envoie une exception si le port fournit n'est pas un integer
+     * @throws IOException Envoie une exception si le port fournit n'est pas un integer
      */
     public Server(int port) throws IOException {
         this.server = new ServerSocket(port, 1);
@@ -42,6 +46,7 @@ public class Server {
 
     /**
      * Cette méthode ajout un EventHandler au server
+     *
      * @param h "h" est l'évenement enfilé
      */
     public void addEventHandler(EventHandler h) {
@@ -79,8 +84,8 @@ public class Server {
     /**
      * Cette méthode gère le stream de données provenant du client. Elle extrait les requêtes
      * et ensuite alerte tous les Handlers.
-     * @throws IOException Cette exception survient lorsque la ligne de requête n'est pas dans un format pouvant être
-     * traité par le programme
+     *
+     * @throws IOException            Cette exception survient lorsque la ligne de requête n'est pas dans un format pouvant être traité par le programme
      * @throws ClassNotFoundException Cette exception survient lorsque le format de donnée reçu n'est pas un Objet.
      */
     public void listen() throws IOException, ClassNotFoundException {
@@ -97,6 +102,7 @@ public class Server {
 
     /**
      * Cette méthode reçoit un String d'une ligne de requête reçu par le server et les décomposes en <commande> et <argument>
+     *
      * @param line "line" est le String de la requêtre reçu par le server
      * @return La méthode retourne une classe Pair (<String commande>, <String arguments>)
      */
@@ -109,6 +115,7 @@ public class Server {
 
     /**
      * Cette méthode déconnecte le client du serveur proprement en fermant les streams de données et la connection.
+     *
      * @throws IOException Envoie un exception s'il y a une erreur d'entré/sortie
      */
     public void disconnect() throws IOException {
@@ -120,8 +127,10 @@ public class Server {
     /**
      * Cette méthode est le "handler" principal de notre server. Elle trie les <cmd> reçu du client
      * et active la réponse appropriée.
+     *
      * @param cmd "cmd" est le String de la commande compris dans une requête
      * @param arg "arg" est le String des arguments compris dans une requête
+     * @throws IOException the io exception
      */
     public void handleEvents(String cmd, String arg) throws IOException {
         if (cmd.equals(REGISTER_COMMAND)) {
@@ -134,11 +143,14 @@ public class Server {
     }
 
     /**
-     Lire un fichier texte contenant des informations sur les cours et les transofmer en liste d'objets 'Course'.
-     La méthode filtre les cours par la session spécifiée en argument.
-     Ensuite, elle renvoie la liste des cours pour une session au client en utilisant l'objet 'objectOutputStream'.
-     La méthode gère les exceptions si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux.
-     @param arg la session pour laquelle on veut récupérer la liste des cours
+     * Lire un fichier texte contenant des informations sur les cours et les transofmer en liste d'objets 'Course'.
+     * La méthode filtre les cours par la session spécifiée en argument.
+     * Ensuite, elle renvoie la liste des cours pour une session au client en utilisant l'objet 'objectOutputStream'.
+     * La méthode gère les exceptions si une erreur se produit lors de la lecture du fichier ou de l'écriture de l'objet dans le flux.
+     *
+     * @param arg la session pour laquelle on veut récupérer la liste des cours
+     * @throws IOException              the io exception
+     * @throws IllegalArgumentException the illegal argument exception
      */
     public void handleLoadCourses(String arg) throws IOException, IllegalArgumentException {
 
@@ -198,6 +210,8 @@ public class Server {
      * et renvoyer un message de confirmation au client.
      * La méthode gére les exceptions si une erreur se produit lors de la lecture de l'objet,
      * l'écriture dans un fichier ou dans le flux de sortie.
+     *
+     * @throws IOException the io exception
      */
     public void handleRegistration() throws IOException {
 
