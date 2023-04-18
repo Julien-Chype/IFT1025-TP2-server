@@ -1,1 +1,2 @@
-	b	f	a	d	d
+Automne	IFT1015	1	C	R	1
+Automne	IFT2255	1	c	r	1

@@ -223,6 +223,10 @@ public class Server {
 
         reponse = "Félicitation! Incription réussi au réussi de " + prenom + " au cours " + sigle + "\n" ;
 
+        if (email.split("@").length != 2){
+            reponse = "veuillez entrer une addresse email valide";
+            estConforme = false;
+        }
 
         //vérifier que le cours existe
         BufferedReader reader ;
@@ -258,7 +262,6 @@ public class Server {
         try {
             reader = new BufferedReader(new FileReader("src/main/java/server/data/inscription.txt"));
         }catch (IOException e){
-            estConforme = false ;
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }
         //Automne IFT2255 87654321 Lanuze Charlotte charlotte@umontreal.ca
@@ -279,15 +282,15 @@ public class Server {
         // ouvrir le writer
         BufferedWriter writer;
         try {
-            writer = new BufferedWriter(new FileWriter("src/main/java/server/data/inscription.txt"));
+            writer = new BufferedWriter(new FileWriter("src/main/java/server/data/inscription.txt", true));
         }catch (IOException e){
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }
 
         // ecrire au fichier
         try{
-            if (estConforme) { writer.write(session + "\t" + sigle + '\t'
-                    + matricule + '\t' + nom + '\t' + prenom + '\t' + email + '\n'); }
+            if (estConforme) {
+                writer.write(session + "\t" + sigle + '\t' + matricule + '\t' + nom + '\t' + prenom + '\t' + email + '\n'); }
         }catch (IOException e){
             throw new IOException("Erreur à l'ouverture du document 'inscription.txt") ;
         }

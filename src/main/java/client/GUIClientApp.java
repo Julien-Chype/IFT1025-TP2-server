@@ -1,6 +1,6 @@
-package client.views;
+package client;
 
-import client.controllers.Client;
+import client.controllers.GUIClient;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,12 +15,13 @@ import server.models.RegistrationForm;
 
 import java.util.ArrayList;
 
-public class GUIclientView extends Application implements ClientView {
+public class GUIClientApp extends Application {
 
     public final static int PORT = 1337;
+    public final static String HOST = "127.0.0.1";
     static void main(String[] args){
-        Client client;
-        client = new Client(PORT, view);
+        GUIClient client;
+        client = new GUIClient(PORT, HOST);
         client.run();
         launch(args);
     }
@@ -28,7 +29,7 @@ public class GUIclientView extends Application implements ClientView {
     @Override
     public void start(Stage primaryStage) {
 
-        root = new HBox();
+        HBox root = new HBox();
 
         VBox leftSide = new VBox();
         VBox rightSide = new VBox();
@@ -109,32 +110,32 @@ public class GUIclientView extends Application implements ClientView {
         root.getChildren().addAll(sep1, leftSide, sep2, rightSide);
         root.setSpacing(20);
 
-        scene = new Scene(root, 600, 300);
+        Scene scene = new Scene(root, 600, 300);
         primaryStage.setTitle("Inscription UdeM");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    public String waitForNextCommand(){
+    static String waitForNextCommand(){
         // this sets up the button waiters
         return "";
     }
-    public RegistrationForm getRegistrationInfo(){
+    static RegistrationForm getRegistrationInfo(){
         // reads the registration info from the forms in the GUI and sends them to controller
         return new RegistrationForm("", "", "", "", new Course("","",""));
     }
-    public String getCourseListSessionInfo(){
+    static String getCourseListSessionInfo(){
         // reads the session label from the stopdown menu button and sends it back
         return "";
     }
-    public void processRegistrationResponse(String response){
+    static void processRegistrationResponse(String response){
         // prints the confirmation message below the "enovyer" button
 
     }
-    public void processCourseListResponse(ArrayList<Course> cours){
+    static void processCourseListResponse(ArrayList<Course> cours){
         // prints the courses in the content table
     }
-    public void processCourseListResponse(String session, ArrayList<Course> cours){
+    static void processCourseListResponse(String session, ArrayList<Course> cours){
 
     }
 }

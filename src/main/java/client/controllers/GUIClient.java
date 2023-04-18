@@ -1,20 +1,17 @@
-
-
 package client.controllers;
 
-import client.views.*;
-import javafx.util.Pair;
+import client.views.ClientView;
 import server.models.Course;
 import server.models.RegistrationForm;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Client {
+public class GUIClient {
+
     /*
     This handles waiting around for the server to respond, maintains a client View to display, along with
 
@@ -31,11 +28,10 @@ public class Client {
     private ClientView view;
     private int PORT ;
     private String HOST ;
-    public Client(int port, ClientView view, String host){
+    public GUIClient(int port, String host){
 
         this.HOST = host ;
         this.PORT = port ;
-        this.view = view;
     }
     public void establishConnection(int port, String host){
         // creation du socket
