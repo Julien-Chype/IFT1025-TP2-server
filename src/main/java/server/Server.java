@@ -61,15 +61,14 @@ public class Server {
      */
     public void run() {
         try {
+            while (true){
             client = server.accept();
             System.out.println("Connecté au client: " + client);
             objectOutputStream = new ObjectOutputStream(client.getOutputStream());
             objectInputStream = new ObjectInputStream(client.getInputStream());
-//            listen();
-//            disconnect();
-//            System.out.println("Client déconnecté!");
-            while (true){
-                listen();
+            listen();
+            disconnect();
+            System.out.println("Client déconnecté!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,7 +114,7 @@ public class Server {
     public void disconnect() throws IOException {
         objectOutputStream.close();
         objectInputStream.close();
-//        client.close();
+        client.close();
     }
 
     /**

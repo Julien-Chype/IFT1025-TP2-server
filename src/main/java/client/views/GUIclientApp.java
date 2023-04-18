@@ -1,6 +1,6 @@
 package client.views;
 
-import client.GUIClientLauncher;
+//import client.GUIClientLauncher;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

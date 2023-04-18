@@ -29,17 +29,28 @@ public class Client {
     private ObjectInputStream input ;
     private ObjectOutputStream output ;
     private ClientView view;
-    public Client(int port, ClientView view){
+    private int PORT ;
+    private String HOST ;
+    public Client(int port, ClientView view, String host){
 
+        this.HOST = host ;
+        this.PORT = port ;
+
+
+
+
+        this.view = view;
+
+    }
+    public void establishConnection(int port, String host){
         // creation du socket
         try {
-            client = new Socket("127.0.0.1", port);
+            client = new Socket(host, port);
         }
         catch(Exception e) {
             System.out.println("Échec de la connection au serveur de l'UDEM");
             System.exit(0) ;
         }
-
         // creation des input et output stream
         try {
 
@@ -51,9 +62,6 @@ public class Client {
             System.out.println("Échec d'établissement de passerelle client/serveur");
             System.exit(0) ;
         }
-
-        this.view = view;
-
     }
 
     public void run(){
@@ -66,6 +74,8 @@ public class Client {
         boolean stop = false;
 
         while(!stop){
+            establishConnection(PORT, HOST);
+
             String command = view.waitForNextCommand();
 
             switch (command) {
@@ -83,6 +93,11 @@ public class Client {
                     String session = view.getCourseListSessionInfo();
                     ArrayList<Course> cours = sendCourseListRequest(session);
                     view.processCourseListResponse(session, cours);
+                    break;
+
+                case "QUITTER":
+                    stop = true;
+                    disconnect();
                     break;
             }
         }
