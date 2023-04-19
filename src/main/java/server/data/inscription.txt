@@ -1,2 +1,4 @@
-Automne	IFT1015	f	asdf	sadfa	a
-Automne	IFT1015	aksdjf	asdf	sadkf	jaskdf@asdf
+Hiver	IFT1025	111	Ciuca	Razvan	raz@udem.ca
+Hiver	IFT2125	111	Ciuca	Razvan	raz@udem.ca
+Ete	IFT2256	112	Ciuca	Test	raz@udem.ca
+Automne	IFT1015	22	C	R	e@e
